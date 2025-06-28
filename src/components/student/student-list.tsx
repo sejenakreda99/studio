@@ -46,27 +46,6 @@ export function StudentList({ students }: StudentListProps) {
     }).format(date);
   };
   
-  if (students.length === 0) {
-     return (
-        <div className="flex h-full flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm">
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h3 className="text-2xl font-bold tracking-tight">
-              Belum ada data siswa
-            </h3>
-            <p className="mb-4 text-sm text-muted-foreground">
-              Mulai dengan menambahkan data siswa baru.
-            </p>
-            <Button asChild>
-              <Link href="/dashboard/add-student">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Tambah Siswa Baru
-              </Link>
-            </Button>
-          </div>
-        </div>
-      );
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -86,6 +65,16 @@ export function StudentList({ students }: StudentListProps) {
         </div>
       </CardHeader>
       <CardContent>
+        {students.length === 0 ? (
+           <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed rounded-lg">
+             <h3 className="text-2xl font-bold tracking-tight">
+               Belum ada data siswa
+             </h3>
+             <p className="mt-2 text-sm text-muted-foreground">
+               Klik tombol "Tambah Siswa" untuk memulai.
+             </p>
+           </div>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow>
@@ -128,6 +117,7 @@ export function StudentList({ students }: StudentListProps) {
             ))}
           </TableBody>
         </Table>
+        )}
       </CardContent>
     </Card>
   );
