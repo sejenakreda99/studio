@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -83,6 +84,7 @@ export function StudentList({ students }: StudentListProps) {
               <TableHead className="hidden md:table-cell">NIS</TableHead>
               <TableHead className="hidden sm:table-cell">Jenis Kelamin</TableHead>
               <TableHead className="hidden lg:table-cell">Tanggal Lahir</TableHead>
+              <TableHead className="hidden md:table-cell">Status Anak</TableHead>
               <TableHead>
                 <span className="sr-only">Aksi</span>
               </TableHead>
@@ -100,6 +102,13 @@ export function StudentList({ students }: StudentListProps) {
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">{formatDate(student.tanggalLahir)}</TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {student.statusAnak && student.statusAnak !== 'Tidak' ? (
+                    <Badge variant="destructive">{student.statusAnak}</Badge>
+                  ) : (
+                    '-'
+                  )}
+                </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

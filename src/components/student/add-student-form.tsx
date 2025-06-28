@@ -37,8 +37,10 @@ const kebutuhanKhususOptions = [
 const tempatTinggalOptions = ['Bersama orang tua', 'Wali', 'Kos', 'Asrama', 'Panti Asuhan', 'Pondok Pesantren'];
 const modaTransportasiOptions = ['Jalan kaki', 'Kendaraan pribadi', 'Kendaraan Umum/angkot/Pete-pete', 'Jemputan Sekolah', 'Kereta Api', 'Ojek', 'Andong/Bendi/Sado/ Dokar/Delman/Beca', 'Perahu penyebrangan/Rakit/Getek', 'Lainnya'];
 const pendidikanOptions = ['Tidak sekolah', 'Putus SD', 'SD Sederajat', 'SMP Sederajat', 'SMA Sederajat', 'D1', 'D2', 'D3', 'D4/S1', 'S2', 'S3'];
-const pekerjaanOptions = ['Tidak bekerja', 'Nelayan', 'Petani', 'Peternak', 'PNS/TNI/POLRI', 'Karyawan Swasta', 'Pedagang Kecil', 'Pedagang Besar', 'Wiraswasta', 'Wirausaha', 'Buruh', 'Pensiunan', 'Meninggal Dunia'];
+const pekerjaanOptions = ['Tidak bekerja', 'Nelayan', 'Petani', 'Peternak', 'PNS/TNI/POLRI', 'Karyawan Swasta', 'Pedagang Kecil', 'Pedagang Besar', 'Wiraswasta', 'Wirausaha', 'Buruh', 'Pensiunan'];
 const penghasilanOptions = ['< Rp. 500.000', 'Rp. 500.000-Rp.999.999', 'Rp. 1.000.000-Rp.1.999.999', 'Rp.2.000.000-Rp.4.999.999', 'Rp.5.000.000-Rp.20.000.000', '> Rp.20.000.000', 'Tidak Berpenghasilan'];
+const statusAnakOptions = ['Tidak', 'Yatim', 'Piatu', 'Yatim Piatu'];
+const statusOrangTuaOptions = ['Masih Hidup', 'Meninggal Dunia'];
 
 export function AddStudentForm() {
   const router = useRouter();
@@ -72,8 +74,10 @@ export function AddStudentForm() {
       tempatTinggal: undefined,
       modaTransportasi: undefined,
       anakKeberapa: '',
+      statusAnak: 'Tidak',
       punyaKip: undefined,
       namaAyah: '',
+      statusAyah: 'Masih Hidup',
       nikAyah: '',
       tahunLahirAyah: '',
       pendidikanAyah: undefined,
@@ -81,6 +85,7 @@ export function AddStudentForm() {
       penghasilanAyah: undefined,
       berkebutuhanKhususAyah: [],
       namaIbu: '',
+      statusIbu: 'Masih Hidup',
       nikIbu: '',
       tahunLahirIbu: '',
       pendidikanIbu: undefined,
@@ -110,6 +115,8 @@ export function AddStudentForm() {
   const { watch } = form;
   const jumlahSaudaraKandung = watch('jumlahSaudaraKandung');
   const jumlahSaudaraTiri = watch('jumlahSaudaraTiri');
+  const statusAyah = watch('statusAyah');
+  const statusIbu = watch('statusIbu');
 
   const totalSaudara = useMemo(() => {
     const kandung = parseInt(jumlahSaudaraKandung || '0', 10);
@@ -144,13 +151,13 @@ export function AddStudentForm() {
     }
   }
 
-  const renderSelect = (name: any, label: string, options: string[]) => (
+  const renderSelect = (name: any, label: string, options: string[], placeholder?: string, disabled?: boolean) => (
     <FormField control={form.control} name={name} render={({ field }) => (
       <FormItem>
         <FormLabel>{label}</FormLabel>
-        <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={disabled}>
           <FormControl>
-            <SelectTrigger><SelectValue placeholder={`Pilih ${label.toLowerCase()}`} /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={placeholder || `Pilih ${label.toLowerCase()}`} /></SelectTrigger>
           </FormControl>
           <SelectContent>{options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
         </Select>
@@ -159,11 +166,11 @@ export function AddStudentForm() {
     )} />
   );
 
-  const renderInput = (name: any, label: string, placeholder: string, type = "text") => (
+  const renderInput = (name: any, label: string, placeholder: string, type = "text", disabled?: boolean) => (
     <FormField control={form.control} name={name} render={({ field }) => (
       <FormItem>
         <FormLabel>{label}</FormLabel>
-        <FormControl><Input placeholder={placeholder} {...field} value={field.value || ''} type={type} /></FormControl>
+        <FormControl><Input placeholder={placeholder} {...field} value={field.value || ''} type={type} disabled={disabled} /></FormControl>
         <FormMessage />
       </FormItem>
     )} />
@@ -191,7 +198,7 @@ export function AddStudentForm() {
     )} />
   );
 
-  const renderCheckboxGroup = (name: any, label: string, options: { id: string, label: string }[]) => (
+  const renderCheckboxGroup = (name: any, label: string, options: { id: string, label: string }[], disabled?: boolean) => (
     <FormField control={form.control} name={name} render={() => (
         <FormItem>
             <FormLabel>{label}</FormLabel>
@@ -207,6 +214,7 @@ export function AddStudentForm() {
                                             ? field.onChange([...(field.value || []), item.id])
                                             : field.onChange(field.value?.filter((value: string) => value !== item.id));
                                     }}
+                                    disabled={disabled}
                                 />
                             </FormControl>
                             <FormLabel className="font-normal">{item.label}</FormLabel>
@@ -246,12 +254,13 @@ export function AddStudentForm() {
                     )} />
                     {renderInput('nisn', 'NISN', 'Contoh: 0009321234')}
                     {renderInput('nis', 'NIS', 'Nomor Induk Siswa')}
+                    {renderSelect('statusAnak', 'Status Yatim/Piatu', statusAnakOptions)}
                     {renderInput('nik', 'NIK', '16 digit NIK siswa')}
                     {renderInput('noKk', 'No. Kartu Keluarga', '16 digit No. KK')}
+                    {renderInput('noRegistrasiAktaLahir', 'No. Registasi Akta Lahir', 'Nomor pada akta kelahiran')}
                     {renderInput('tempatLahir', 'Tempat Lahir', 'Sesuai dokumen resmi')}
                     {renderDate('tanggalLahir', 'Tanggal Lahir')}
-                    {renderInput('noRegistrasiAktaLahir', 'No. Registasi Akta Lahir', 'Nomor pada akta kelahiran')}
-                    {renderSelect('agama', 'Agama & Kepercayaan', agamaOptions)}
+                    {renderSelect('agama', 'Agama & Kepercayaan', agamaOptions, 'Pilih agama')}
                     <FormField control={form.control} name="kewarganegaraan" render={({ field }) => (
                     <FormItem><FormLabel>Kewarganegaraan</FormLabel><FormControl><RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4 pt-2">
                         <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="WNI" /></FormControl><FormLabel className="font-normal">WNI</FormLabel></FormItem>
@@ -266,9 +275,9 @@ export function AddStudentForm() {
                     {renderInput('namaKelurahanDesa', 'Nama Kelurahan/Desa', 'Contoh: Bayongbong')}
                     {renderInput('kecamatan', 'Kecamatan', 'Contoh: Garut Kota')}
                     {renderInput('kodePos', 'Kode Pos', 'Contoh: 44100')}
-                    {renderSelect('tempatTinggal', 'Tempat Tinggal', tempatTinggalOptions)}
-                    {renderSelect('modaTransportasi', 'Moda Transportasi', modaTransportasiOptions)}
-                    {renderInput('anakKeberapa', 'Anak Ke-berapa', 'Urutan pada Kartu Keluarga')}
+                    {renderSelect('tempatTinggal', 'Tempat Tinggal', tempatTinggalOptions, 'Pilih tempat tinggal')}
+                    {renderSelect('modaTransportasi', 'Moda Transportasi', modaTransportasiOptions, 'Pilih moda transportasi')}
+                    {renderInput('anakKeberapa', 'Anak Ke-berapa', 'Urutan pada Kartu Keluarga', 'number')}
                     <FormField control={form.control} name="punyaKip" render={({ field }) => (
                     <FormItem><FormLabel>Punya KIP?</FormLabel><FormControl><RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4 pt-2">
                         <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Ya" /></FormControl><FormLabel className="font-normal">Ya</FormLabel></FormItem>
@@ -291,7 +300,7 @@ export function AddStudentForm() {
                     {renderInput('hobi', 'Hobi', 'Contoh: Membaca buku')}
                     {renderInput('citaCita', 'Cita-cita', 'Contoh: Dokter')}
                     <div className="md:col-span-2 lg:col-span-3">
-                    {renderCheckboxGroup('berkebutuhanKhusus', 'Berkebutuhan Khusus', kebutuhanKhususOptions)}
+                    {renderCheckboxGroup('berkebutuhanKhusus', 'Berkebutuhan Khusus Siswa', kebutuhanKhususOptions)}
                     </div>
                 </div>
             </TabsContent>
@@ -299,27 +308,29 @@ export function AddStudentForm() {
             <TabsContent value="dataAyah">
                 <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 pt-6">
                     {renderInput('namaAyah', 'Nama Ayah Kandung', 'Tanpa gelar')}
-                    {renderInput('nikAyah', 'NIK Ayah', '16 digit NIK')}
-                    {renderInput('tahunLahirAyah', 'Tahun Lahir Ayah', 'Contoh: 1970')}
-                    {renderSelect('pendidikanAyah', 'Pendidikan Terakhir Ayah', pendidikanOptions)}
-                    {renderSelect('pekerjaanAyah', 'Pekerjaan Ayah', pekerjaanOptions)}
-                    {renderSelect('penghasilanAyah', 'Penghasilan Bulanan Ayah', penghasilanOptions)}
+                    {renderSelect('statusAyah', 'Status Ayah', statusOrangTuaOptions)}
+                    {renderInput('nikAyah', 'NIK Ayah', '16 digit NIK', 'text', statusAyah === 'Meninggal Dunia')}
+                    {renderInput('tahunLahirAyah', 'Tahun Lahir Ayah', 'Contoh: 1970', 'number', statusAyah === 'Meninggal Dunia')}
+                    {renderSelect('pendidikanAyah', 'Pendidikan Terakhir Ayah', pendidikanOptions, 'Pilih pendidikan', statusAyah === 'Meninggal Dunia')}
+                    {renderSelect('pekerjaanAyah', 'Pekerjaan Ayah', pekerjaanOptions, 'Pilih pekerjaan', statusAyah === 'Meninggal Dunia')}
+                    {renderSelect('penghasilanAyah', 'Penghasilan Bulanan Ayah', penghasilanOptions, 'Pilih penghasilan', statusAyah === 'Meninggal Dunia')}
                     <div className="md:col-span-2 lg:col-span-3">
-                    {renderCheckboxGroup('berkebutuhanKhususAyah', 'Berkebutuhan Khusus Ayah', kebutuhanKhususOptions)}
+                    {renderCheckboxGroup('berkebutuhanKhususAyah', 'Berkebutuhan Khusus Ayah', kebutuhanKhususOptions, statusAyah === 'Meninggal Dunia')}
                     </div>
                 </div>
             </TabsContent>
 
             <TabsContent value="dataIbu">
-                <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:col-span-3 pt-6">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 pt-6">
                     {renderInput('namaIbu', 'Nama Ibu Kandung', 'Sesuai akta/ijazah')}
-                    {renderInput('nikIbu', 'NIK Ibu', '16 digit NIK')}
-                    {renderInput('tahunLahirIbu', 'Tahun Lahir Ibu', 'Contoh: 1975')}
-                    {renderSelect('pendidikanIbu', 'Pendidikan Terakhir Ibu', pendidikanOptions)}
-                    {renderSelect('pekerjaanIbu', 'Pekerjaan Ibu', pekerjaanOptions)}
-                    {renderSelect('penghasilanIbu', 'Penghasilan Bulanan Ibu', penghasilanOptions)}
+                    {renderSelect('statusIbu', 'Status Ibu', statusOrangTuaOptions)}
+                    {renderInput('nikIbu', 'NIK Ibu', '16 digit NIK', 'text', statusIbu === 'Meninggal Dunia')}
+                    {renderInput('tahunLahirIbu', 'Tahun Lahir Ibu', 'Contoh: 1975', 'number', statusIbu === 'Meninggal Dunia')}
+                    {renderSelect('pendidikanIbu', 'Pendidikan Terakhir Ibu', pendidikanOptions, 'Pilih pendidikan', statusIbu === 'Meninggal Dunia')}
+                    {renderSelect('pekerjaanIbu', 'Pekerjaan Ibu', pekerjaanOptions, 'Pilih pekerjaan', statusIbu === 'Meninggal Dunia')}
+                    {renderSelect('penghasilanIbu', 'Penghasilan Bulanan Ibu', penghasilanOptions, 'Pilih penghasilan', statusIbu === 'Meninggal Dunia')}
                     <div className="md:col-span-2 lg:col-span-3">
-                    {renderCheckboxGroup('berkebutuhanKhususIbu', 'Berkebutuhan Khusus Ibu', kebutuhanKhususOptions)}
+                    {renderCheckboxGroup('berkebutuhanKhususIbu', 'Berkebutuhan Khusus Ibu', kebutuhanKhususOptions, statusIbu === 'Meninggal Dunia')}
                     </div>
                 </div>
             </TabsContent>
@@ -328,10 +339,10 @@ export function AddStudentForm() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 pt-6">
                     {renderInput('namaWali', 'Nama Wali', 'Boleh dikosongkan')}
                     {renderInput('nikWali', 'NIK Wali', '16 digit NIK')}
-                    {renderInput('tahunLahirWali', 'Tahun Lahir Wali', 'Contoh: 1980')}
-                    {renderSelect('pendidikanWali', 'Pendidikan Terakhir Wali', pendidikanOptions)}
-                    {renderSelect('pekerjaanWali', 'Pekerjaan Wali', pekerjaanOptions)}
-                    {renderSelect('penghasilanWali', 'Penghasilan Bulanan Wali', penghasilanOptions)}
+                    {renderInput('tahunLahirWali', 'Tahun Lahir Wali', 'Contoh: 1980', 'number')}
+                    {renderSelect('pendidikanWali', 'Pendidikan Terakhir Wali', pendidikanOptions, 'Pilih pendidikan')}
+                    {renderSelect('pekerjaanWali', 'Pekerjaan Wali', pekerjaanOptions, 'Pilih pekerjaan')}
+                    {renderSelect('penghasilanWali', 'Penghasilan Bulanan Wali', penghasilanOptions, 'Pilih penghasilan')}
                 </div>
             </TabsContent>
 

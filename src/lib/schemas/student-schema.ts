@@ -28,6 +28,7 @@ export const studentFormSchema = z.object({
   tempatTinggal: optionalString,
   modaTransportasi: optionalString,
   anakKeberapa: optionalString,
+  statusAnak: optionalString,
   punyaKip: z.enum(['Ya', 'Tidak']).optional(),
   sekolahAsal: optionalString,
   tinggiBadan: optionalString,
@@ -40,6 +41,7 @@ export const studentFormSchema = z.object({
 
   // DATA AYAH KANDUNG
   namaAyah: z.string().min(1, 'Nama ayah harus diisi.'),
+  statusAyah: optionalString,
   nikAyah: z.string().length(16, 'NIK Ayah harus 16 digit.').optional().or(z.literal('')),
   tahunLahirAyah: optionalString,
   pendidikanAyah: optionalString,
@@ -49,6 +51,7 @@ export const studentFormSchema = z.object({
 
   // DATA IBU KANDUNG
   namaIbu: z.string().min(1, 'Nama ibu harus diisi.'),
+  statusIbu: optionalString,
   nikIbu: z.string().length(16, 'NIK Ibu harus 16 digit.').optional().or(z.literal('')),
   tahunLahirIbu: optionalString,
   pendidikanIbu: optionalString,
