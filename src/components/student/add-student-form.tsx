@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -21,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { CalendarIcon, Loader2 } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const agamaOptions = ['Islam', 'Kristen/Protestan', 'Katholik', 'Hindu', 'Budha', 'Khonghucu', 'Kepercayaan Kepada Tuhan YME'];
 const kebutuhanKhususOptions = [
@@ -38,17 +39,6 @@ const modaTransportasiOptions = ['Jalan kaki', 'Kendaraan pribadi', 'Kendaraan U
 const pendidikanOptions = ['Tidak sekolah', 'Putus SD', 'SD Sederajat', 'SMP Sederajat', 'SMA Sederajat', 'D1', 'D2', 'D3', 'D4/S1', 'S2', 'S3'];
 const pekerjaanOptions = ['Tidak bekerja', 'Nelayan', 'Petani', 'Peternak', 'PNS/TNI/POLRI', 'Karyawan Swasta', 'Pedagang Kecil', 'Pedagang Besar', 'Wiraswasta', 'Wirausaha', 'Buruh', 'Pensiunan', 'Meninggal Dunia'];
 const penghasilanOptions = ['< Rp. 500.000', 'Rp. 500.000-Rp.999.999', 'Rp. 1.000.000-Rp.1.999.999', 'Rp.2.000.000-Rp.4.999.999', 'Rp.5.000.000-Rp.20.000.000', '> Rp.20.000.000', 'Tidak Berpenghasilan'];
-
-const FormSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <AccordionItem value={title}>
-    <AccordionTrigger className="text-lg font-semibold">{title}</AccordionTrigger>
-    <AccordionContent>
-      <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
-        {children}
-      </div>
-    </AccordionContent>
-  </AccordionItem>
-);
 
 export function AddStudentForm() {
   const router = useRouter();
@@ -173,90 +163,108 @@ export function AddStudentForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <h2 className="text-2xl font-bold">Formulir Pendaftaran Siswa Baru</h2>
-        <Accordion type="multiple" defaultValue={['Data Pribadi']} className="w-full">
-          <FormSection title="Data Pribadi">
-            {renderDate('tanggalRegistrasi', 'Tanggal Registrasi')}
-            {renderInput('namaLengkap', 'Nama Lengkap', 'Sesuai akta/ijazah')}
-            <FormField control={form.control} name="jenisKelamin" render={({ field }) => (
-              <FormItem><FormLabel>Jenis Kelamin</FormLabel><FormControl><RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4 pt-2">
-                <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Laki-laki" /></FormControl><FormLabel className="font-normal">Laki-laki</FormLabel></FormItem>
-                <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Perempuan" /></FormControl><FormLabel className="font-normal">Perempuan</FormLabel></FormItem>
-              </RadioGroup></FormControl><FormMessage /></FormItem>
-            )} />
-            {renderInput('nisn', 'NISN', 'Contoh: 0009321234')}
-            {renderInput('nik', 'NIK', '16 digit NIK siswa')}
-            {renderInput('noKk', 'No. Kartu Keluarga', '16 digit No. KK')}
-            {renderInput('tempatLahir', 'Tempat Lahir', 'Sesuai dokumen resmi')}
-            {renderDate('tanggalLahir', 'Tanggal Lahir')}
-            {renderInput('noRegistrasiAktaLahir', 'No. Registasi Akta Lahir', 'Nomor pada akta kelahiran')}
-            {renderSelect('agama', 'Agama & Kepercayaan', agamaOptions)}
-            <FormField control={form.control} name="kewarganegaraan" render={({ field }) => (
-              <FormItem><FormLabel>Kewarganegaraan</FormLabel><FormControl><RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4 pt-2">
-                <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="WNI" /></FormControl><FormLabel className="font-normal">WNI</FormLabel></FormItem>
-                <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="WNA" /></FormControl><FormLabel className="font-normal">WNA</FormLabel></FormItem>
-              </RadioGroup></FormControl><FormMessage /></FormItem>
-            )} />
-            {form.watch('kewarganegaraan') === 'WNA' && renderInput('namaNegara', 'Nama Negara', 'Masukkan nama negara')}
-            {renderInput('alamatJalan', 'Alamat Jalan', 'Jl. Pendidikan No. 1')}
-            {renderInput('rt', 'RT', '001')}
-            {renderInput('rw', 'RW', '002')}
-            {renderInput('namaDusun', 'Nama Dusun', 'Contoh: Cempaka')}
-            {renderInput('namaKelurahanDesa', 'Nama Kelurahan/Desa', 'Contoh: Bayongbong')}
-            {renderInput('kecamatan', 'Kecamatan', 'Contoh: Garut Kota')}
-            {renderInput('kodePos', 'Kode Pos', 'Contoh: 44100')}
-            {renderSelect('tempatTinggal', 'Tempat Tinggal', tempatTinggalOptions)}
-            {renderSelect('modaTransportasi', 'Moda Transportasi', modaTransportasiOptions)}
-            {renderInput('anakKeberapa', 'Anak Ke-berapa', 'Urutan pada Kartu Keluarga')}
-            <FormField control={form.control} name="punyaKip" render={({ field }) => (
-              <FormItem><FormLabel>Punya KIP?</FormLabel><FormControl><RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4 pt-2">
-                <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Ya" /></FormControl><FormLabel className="font-normal">Ya</FormLabel></FormItem>
-                <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Tidak" /></FormControl><FormLabel className="font-normal">Tidak</FormLabel></FormItem>
-              </RadioGroup></FormControl><FormMessage /></FormItem>
-            )} />
-            <div className="md:col-span-2 lg:col-span-3">
-              {renderCheckboxGroup('berkebutuhanKhusus', 'Berkebutuhan Khusus', kebutuhanKhususOptions)}
-            </div>
-          </FormSection>
+        <Tabs defaultValue="dataPribadi" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+                <TabsTrigger value="dataPribadi">Data Pribadi</TabsTrigger>
+                <TabsTrigger value="dataAyah">Data Ayah</TabsTrigger>
+                <TabsTrigger value="dataIbu">Data Ibu</TabsTrigger>
+                <TabsTrigger value="dataWali">Data Wali</TabsTrigger>
+                <TabsTrigger value="kontak">Kontak</TabsTrigger>
+            </TabsList>
 
-          <FormSection title="Data Ayah Kandung">
-            {renderInput('namaAyah', 'Nama Ayah Kandung', 'Tanpa gelar')}
-            {renderInput('nikAyah', 'NIK Ayah', '16 digit NIK')}
-            {renderInput('tahunLahirAyah', 'Tahun Lahir Ayah', 'Contoh: 1970')}
-            {renderSelect('pendidikanAyah', 'Pendidikan Terakhir Ayah', pendidikanOptions)}
-            {renderSelect('pekerjaanAyah', 'Pekerjaan Ayah', pekerjaanOptions)}
-            {renderSelect('penghasilanAyah', 'Penghasilan Bulanan Ayah', penghasilanOptions)}
-            <div className="md:col-span-2 lg:col-span-3">
-              {renderCheckboxGroup('berkebutuhanKhususAyah', 'Berkebutuhan Khusus Ayah', kebutuhanKhususOptions)}
-            </div>
-          </FormSection>
-          
-          <FormSection title="Data Ibu Kandung">
-            {renderInput('namaIbu', 'Nama Ibu Kandung', 'Sesuai akta/ijazah')}
-            {renderInput('nikIbu', 'NIK Ibu', '16 digit NIK')}
-            {renderInput('tahunLahirIbu', 'Tahun Lahir Ibu', 'Contoh: 1975')}
-            {renderSelect('pendidikanIbu', 'Pendidikan Terakhir Ibu', pendidikanOptions)}
-            {renderSelect('pekerjaanIbu', 'Pekerjaan Ibu', pekerjaanOptions)}
-            {renderSelect('penghasilanIbu', 'Penghasilan Bulanan Ibu', penghasilanOptions)}
-             <div className="md:col-span-2 lg:col-span-3">
-              {renderCheckboxGroup('berkebutuhanKhususIbu', 'Berkebutuhan Khusus Ibu', kebutuhanKhususOptions)}
-            </div>
-          </FormSection>
-          
-          <FormSection title="Data Wali">
-            {renderInput('namaWali', 'Nama Wali', 'Boleh dikosongkan')}
-            {renderInput('nikWali', 'NIK Wali', '16 digit NIK')}
-            {renderInput('tahunLahirWali', 'Tahun Lahir Wali', 'Contoh: 1980')}
-            {renderSelect('pendidikanWali', 'Pendidikan Terakhir Wali', pendidikanOptions)}
-            {renderSelect('pekerjaanWali', 'Pekerjaan Wali', pekerjaanOptions)}
-            {renderSelect('penghasilanWali', 'Penghasilan Bulanan Wali', penghasilanOptions)}
-          </FormSection>
+            <TabsContent value="dataPribadi">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 pt-6">
+                    {renderDate('tanggalRegistrasi', 'Tanggal Registrasi')}
+                    {renderInput('namaLengkap', 'Nama Lengkap', 'Sesuai akta/ijazah')}
+                    <FormField control={form.control} name="jenisKelamin" render={({ field }) => (
+                    <FormItem><FormLabel>Jenis Kelamin</FormLabel><FormControl><RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4 pt-2">
+                        <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Laki-laki" /></FormControl><FormLabel className="font-normal">Laki-laki</FormLabel></FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Perempuan" /></FormControl><FormLabel className="font-normal">Perempuan</FormLabel></FormItem>
+                    </RadioGroup></FormControl><FormMessage /></FormItem>
+                    )} />
+                    {renderInput('nisn', 'NISN', 'Contoh: 0009321234')}
+                    {renderInput('nik', 'NIK', '16 digit NIK siswa')}
+                    {renderInput('noKk', 'No. Kartu Keluarga', '16 digit No. KK')}
+                    {renderInput('tempatLahir', 'Tempat Lahir', 'Sesuai dokumen resmi')}
+                    {renderDate('tanggalLahir', 'Tanggal Lahir')}
+                    {renderInput('noRegistrasiAktaLahir', 'No. Registasi Akta Lahir', 'Nomor pada akta kelahiran')}
+                    {renderSelect('agama', 'Agama & Kepercayaan', agamaOptions)}
+                    <FormField control={form.control} name="kewarganegaraan" render={({ field }) => (
+                    <FormItem><FormLabel>Kewarganegaraan</FormLabel><FormControl><RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4 pt-2">
+                        <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="WNI" /></FormControl><FormLabel className="font-normal">WNI</FormLabel></FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="WNA" /></FormControl><FormLabel className="font-normal">WNA</FormLabel></FormItem>
+                    </RadioGroup></FormControl><FormMessage /></FormItem>
+                    )} />
+                    {form.watch('kewarganegaraan') === 'WNA' && renderInput('namaNegara', 'Nama Negara', 'Masukkan nama negara')}
+                    {renderInput('alamatJalan', 'Alamat Jalan', 'Jl. Pendidikan No. 1')}
+                    {renderInput('rt', 'RT', '001')}
+                    {renderInput('rw', 'RW', '002')}
+                    {renderInput('namaDusun', 'Nama Dusun', 'Contoh: Cempaka')}
+                    {renderInput('namaKelurahanDesa', 'Nama Kelurahan/Desa', 'Contoh: Bayongbong')}
+                    {renderInput('kecamatan', 'Kecamatan', 'Contoh: Garut Kota')}
+                    {renderInput('kodePos', 'Kode Pos', 'Contoh: 44100')}
+                    {renderSelect('tempatTinggal', 'Tempat Tinggal', tempatTinggalOptions)}
+                    {renderSelect('modaTransportasi', 'Moda Transportasi', modaTransportasiOptions)}
+                    {renderInput('anakKeberapa', 'Anak Ke-berapa', 'Urutan pada Kartu Keluarga')}
+                    <FormField control={form.control} name="punyaKip" render={({ field }) => (
+                    <FormItem><FormLabel>Punya KIP?</FormLabel><FormControl><RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4 pt-2">
+                        <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Ya" /></FormControl><FormLabel className="font-normal">Ya</FormLabel></FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Tidak" /></FormControl><FormLabel className="font-normal">Tidak</FormLabel></FormItem>
+                    </RadioGroup></FormControl><FormMessage /></FormItem>
+                    )} />
+                    <div className="md:col-span-2 lg:col-span-3">
+                    {renderCheckboxGroup('berkebutuhanKhusus', 'Berkebutuhan Khusus', kebutuhanKhususOptions)}
+                    </div>
+                </div>
+            </TabsContent>
+            
+            <TabsContent value="dataAyah">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 pt-6">
+                    {renderInput('namaAyah', 'Nama Ayah Kandung', 'Tanpa gelar')}
+                    {renderInput('nikAyah', 'NIK Ayah', '16 digit NIK')}
+                    {renderInput('tahunLahirAyah', 'Tahun Lahir Ayah', 'Contoh: 1970')}
+                    {renderSelect('pendidikanAyah', 'Pendidikan Terakhir Ayah', pendidikanOptions)}
+                    {renderSelect('pekerjaanAyah', 'Pekerjaan Ayah', pekerjaanOptions)}
+                    {renderSelect('penghasilanAyah', 'Penghasilan Bulanan Ayah', penghasilanOptions)}
+                    <div className="md:col-span-2 lg:col-span-3">
+                    {renderCheckboxGroup('berkebutuhanKhususAyah', 'Berkebutuhan Khusus Ayah', kebutuhanKhususOptions)}
+                    </div>
+                </div>
+            </TabsContent>
 
-          <FormSection title="Kontak">
-            {renderInput('nomorTeleponRumah', 'Nomor Telepon Rumah', 'Milik pribadi/orang tua/wali')}
-            {renderInput('nomorHp', 'Nomor HP', 'Milik pribadi/orang tua/wali')}
-            {renderInput('email', 'Email', 'contoh@email.com', 'email')}
-          </FormSection>
-        </Accordion>
+            <TabsContent value="dataIbu">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:col-span-3 pt-6">
+                    {renderInput('namaIbu', 'Nama Ibu Kandung', 'Sesuai akta/ijazah')}
+                    {renderInput('nikIbu', 'NIK Ibu', '16 digit NIK')}
+                    {renderInput('tahunLahirIbu', 'Tahun Lahir Ibu', 'Contoh: 1975')}
+                    {renderSelect('pendidikanIbu', 'Pendidikan Terakhir Ibu', pendidikanOptions)}
+                    {renderSelect('pekerjaanIbu', 'Pekerjaan Ibu', pekerjaanOptions)}
+                    {renderSelect('penghasilanIbu', 'Penghasilan Bulanan Ibu', penghasilanOptions)}
+                    <div className="md:col-span-2 lg:col-span-3">
+                    {renderCheckboxGroup('berkebutuhanKhususIbu', 'Berkebutuhan Khusus Ibu', kebutuhanKhususOptions)}
+                    </div>
+                </div>
+            </TabsContent>
+
+            <TabsContent value="dataWali">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 pt-6">
+                    {renderInput('namaWali', 'Nama Wali', 'Boleh dikosongkan')}
+                    {renderInput('nikWali', 'NIK Wali', '16 digit NIK')}
+                    {renderInput('tahunLahirWali', 'Tahun Lahir Wali', 'Contoh: 1980')}
+                    {renderSelect('pendidikanWali', 'Pendidikan Terakhir Wali', pendidikanOptions)}
+                    {renderSelect('pekerjaanWali', 'Pekerjaan Wali', pekerjaanOptions)}
+                    {renderSelect('penghasilanWali', 'Penghasilan Bulanan Wali', penghasilanOptions)}
+                </div>
+            </TabsContent>
+
+            <TabsContent value="kontak">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 pt-6">
+                    {renderInput('nomorTeleponRumah', 'Nomor Telepon Rumah', 'Milik pribadi/orang tua/wali')}
+                    {renderInput('nomorHp', 'Nomor HP', 'Milik pribadi/orang tua/wali')}
+                    {renderInput('email', 'Email', 'contoh@email.com', 'email')}
+                </div>
+            </TabsContent>
+        </Tabs>
         
         <div className="flex justify-end">
           <Button type="submit" size="lg" disabled={isLoading}>
@@ -268,3 +276,6 @@ export function AddStudentForm() {
     </Form>
   );
 }
+
+
+    
