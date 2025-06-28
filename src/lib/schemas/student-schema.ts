@@ -8,6 +8,7 @@ export const studentFormSchema = z.object({
   namaLengkap: z.string().min(1, 'Nama lengkap harus diisi.'),
   jenisKelamin: z.enum(['Laki-laki', 'Perempuan'], { required_error: 'Jenis kelamin harus dipilih.' }),
   nisn: z.string().max(10, 'NISN maksimal 10 digit.').optional().or(z.literal('')),
+  nis: optionalString,
   nik: z.string().length(16, 'NIK harus 16 digit.').optional().or(z.literal('')),
   noKk: optionalString,
   tempatLahir: z.string().min(1, 'Tempat lahir harus diisi.'),

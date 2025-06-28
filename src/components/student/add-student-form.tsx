@@ -52,6 +52,7 @@ export function AddStudentForm() {
       namaLengkap: '',
       jenisKelamin: 'Laki-laki',
       nisn: '',
+      nis: '',
       nik: '',
       noKk: '',
       tempatLahir: '',
@@ -143,7 +144,7 @@ export function AddStudentForm() {
     <FormField control={form.control} name={name} render={({ field }) => (
       <FormItem>
         <FormLabel>{label}</FormLabel>
-        <FormControl><Input placeholder={placeholder} {...field} type={type} /></FormControl>
+        <FormControl><Input placeholder={placeholder} {...field} value={field.value || ''} type={type} /></FormControl>
         <FormMessage />
       </FormItem>
     )} />
@@ -225,6 +226,7 @@ export function AddStudentForm() {
                     </RadioGroup></FormControl><FormMessage /></FormItem>
                     )} />
                     {renderInput('nisn', 'NISN', 'Contoh: 0009321234')}
+                    {renderInput('nis', 'NIS', 'Nomor Induk Siswa')}
                     {renderInput('nik', 'NIK', '16 digit NIK siswa')}
                     {renderInput('noKk', 'No. Kartu Keluarga', '16 digit No. KK')}
                     {renderInput('tempatLahir', 'Tempat Lahir', 'Sesuai dokumen resmi')}

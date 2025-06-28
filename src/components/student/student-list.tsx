@@ -80,6 +80,7 @@ export function StudentList({ students }: StudentListProps) {
             <TableRow>
               <TableHead>Nama Lengkap</TableHead>
               <TableHead className="hidden md:table-cell">NISN</TableHead>
+              <TableHead className="hidden md:table-cell">NIS</TableHead>
               <TableHead className="hidden sm:table-cell">Jenis Kelamin</TableHead>
               <TableHead className="hidden lg:table-cell">Tanggal Lahir</TableHead>
               <TableHead>
@@ -92,6 +93,7 @@ export function StudentList({ students }: StudentListProps) {
               <TableRow key={student.id}>
                 <TableCell className="font-medium">{student.namaLengkap}</TableCell>
                 <TableCell className="hidden md:table-cell">{student.nisn || '-'}</TableCell>
+                <TableCell className="hidden md:table-cell">{student.nis || '-'}</TableCell>
                 <TableCell className="hidden sm:table-cell">
                    <Badge variant={student.jenisKelamin === 'Laki-laki' ? 'default' : 'secondary'}>
                     {student.jenisKelamin}

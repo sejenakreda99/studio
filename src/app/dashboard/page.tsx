@@ -30,6 +30,7 @@ async function getStudents(): Promise<Student[]> {
         namaLengkap: data.namaLengkap || '',
         jenisKelamin: data.jenisKelamin || 'Laki-laki',
         nisn: data.nisn || '',
+        nis: data.nis || '',
         nik: data.nik || '',
         noKk: data.noKk || '',
         tempatLahir: data.tempatLahir || '',
