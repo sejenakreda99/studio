@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { studentFormSchema, StudentFormValues } from '@/lib/schemas/student-schema';
@@ -96,8 +96,25 @@ export function AddStudentForm() {
       nomorTeleponRumah: '',
       nomorHp: '',
       email: '',
+      sekolahAsal: '',
+      tinggiBadan: '',
+      beratBadan: '',
+      lingkarKepala: '',
+      jumlahSaudaraKandung: '',
+      jumlahSaudaraTiri: '',
     },
   });
+
+  const { watch } = form;
+  const jumlahSaudaraKandung = watch('jumlahSaudaraKandung');
+  const jumlahSaudaraTiri = watch('jumlahSaudaraTiri');
+
+  const totalSaudara = useMemo(() => {
+    const kandung = parseInt(jumlahSaudaraKandung || '0', 10);
+    const tiri = parseInt(jumlahSaudaraTiri || '0', 10);
+    return (isNaN(kandung) ? 0 : kandung) + (isNaN(tiri) ? 0 : tiri);
+  }, [jumlahSaudaraKandung, jumlahSaudaraTiri]);
+
 
   async function onSubmit(data: StudentFormValues) {
     setIsLoading(true);
@@ -207,12 +224,13 @@ export function AddStudentForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <h2 className="text-2xl font-bold">Formulir Pendaftaran Siswa Baru</h2>
         <Tabs defaultValue="dataPribadi" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
                 <TabsTrigger value="dataPribadi">Data Pribadi</TabsTrigger>
                 <TabsTrigger value="dataAyah">Data Ayah</TabsTrigger>
                 <TabsTrigger value="dataIbu">Data Ibu</TabsTrigger>
                 <TabsTrigger value="dataWali">Data Wali</TabsTrigger>
                 <TabsTrigger value="kontak">Kontak</TabsTrigger>
+                <TabsTrigger value="dataLainnya">Data Lainnya</TabsTrigger>
             </TabsList>
 
             <TabsContent value="dataPribadi">
@@ -308,6 +326,24 @@ export function AddStudentForm() {
                     {renderInput('email', 'Email', 'contoh@email.com', 'email')}
                 </div>
             </TabsContent>
+
+            <TabsContent value="dataLainnya">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 pt-6">
+                    {renderInput('sekolahAsal', 'Asal Sekolah SMP/MTs', 'Nama sekolah sebelumnya')}
+                    {renderInput('tinggiBadan', 'Tinggi Badan (cm)', 'Contoh: 160', 'number')}
+                    {renderInput('beratBadan', 'Berat Badan (kg)', 'Contoh: 50', 'number')}
+                    {renderInput('lingkarKepala', 'Lingkar Kepala (cm)', 'Contoh: 55', 'number')}
+                    {renderInput('jumlahSaudaraKandung', 'Jumlah Saudara Kandung', 'Contoh: 2', 'number')}
+                    {renderInput('jumlahSaudaraTiri', 'Jumlah Saudara Tiri', 'Contoh: 1', 'number')}
+                     <FormItem>
+                        <FormLabel>Total Saudara</FormLabel>
+                        <FormControl>
+                            <Input value={totalSaudara} disabled className="bg-muted" />
+                        </FormControl>
+                        <FormDescription>Dihitung otomatis dari saudara kandung & tiri.</FormDescription>
+                    </FormItem>
+                </div>
+            </TabsContent>
         </Tabs>
         
         <div className="flex justify-end">
@@ -320,8 +356,3 @@ export function AddStudentForm() {
     </Form>
   );
 }
-
-
-    
-
-    

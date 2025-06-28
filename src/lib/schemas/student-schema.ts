@@ -60,6 +60,14 @@ export const studentFormSchema = z.object({
   nomorTeleponRumah: optionalString,
   nomorHp: optionalString,
   email: z.string().email({ message: 'Email tidak valid.' }).optional().or(z.literal('')),
+
+  // DATA LAINNYA
+  sekolahAsal: optionalString,
+  tinggiBadan: optionalString,
+  beratBadan: optionalString,
+  lingkarKepala: optionalString,
+  jumlahSaudaraKandung: optionalString,
+  jumlahSaudaraTiri: optionalString,
 });
 
 export type StudentFormValues = z.infer<typeof studentFormSchema>;

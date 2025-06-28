@@ -75,6 +75,12 @@ async function getStudents(): Promise<Student[]> {
         nomorHp: data.nomorHp || '',
         email: data.email || '',
         tanggalRegistrasi: data.tanggalRegistrasi || '',
+        sekolahAsal: data.sekolahAsal || '',
+        tinggiBadan: data.tinggiBadan || '',
+        beratBadan: data.beratBadan || '',
+        lingkarKepala: data.lingkarKepala || '',
+        jumlahSaudaraKandung: data.jumlahSaudaraKandung || '',
+        jumlahSaudaraTiri: data.jumlahSaudaraTiri || '',
       };
     });
 
