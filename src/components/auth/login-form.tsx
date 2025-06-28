@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2, AtSign, Lock } from "lucide-react";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { auth } from "@/lib/firebase";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -44,26 +46,23 @@ export function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    if (
-      values.email === "admin@datasiswa.com" &&
-      values.password === "admin123456"
-    ) {
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Login Berhasil",
         description: "Selamat datang, Admin!",
       });
       router.push("/dashboard");
-    } else {
+    } catch (error) {
+      console.error("Firebase Authentication error:", error);
       toast({
         variant: "destructive",
         title: "Login Gagal",
         description: "Email atau password yang Anda masukkan salah.",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   return (
