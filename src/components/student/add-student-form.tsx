@@ -33,7 +33,7 @@ const kebutuhanKhususOptions = [
   { id: 'Kesulitan Belajar (K)', label: 'Kesulitan Belajar (K)' }, { id: 'Narkoba (N)', label: 'Narkoba (N)' },
   { id: 'Indigo (O)', label: 'Indigo (O)' }, { id: 'Down Sindrome (P)', label: 'Down Sindrome (P)' }, { id: 'Autis (Q)', label: 'Autis (Q)' },
 ];
-const tempatTinggalOptions = ['Bersama orang tua', 'Wali', 'Kos', 'Asrama', 'Panti Asuhan'];
+const tempatTinggalOptions = ['Bersama orang tua', 'Wali', 'Kos', 'Asrama', 'Panti Asuhan', 'Pondok Pesantren'];
 const modaTransportasiOptions = ['Jalan kaki', 'Kendaraan pribadi', 'Kendaraan Umum/angkot/Pete-pete', 'Jemputan Sekolah', 'Kereta Api', 'Ojek', 'Andong/Bendi/Sado/ Dokar/Delman/Beca', 'Perahu penyebrangan/Rakit/Getek', 'Lainnya'];
 const pendidikanOptions = ['Tidak sekolah', 'Putus SD', 'SD Sederajat', 'SMP Sederajat', 'SMA Sederajat', 'D1', 'D2', 'D3', 'D4/S1', 'S2', 'S3'];
 const pekerjaanOptions = ['Tidak bekerja', 'Nelayan', 'Petani', 'Peternak', 'PNS/TNI/POLRI', 'Karyawan Swasta', 'Pedagang Kecil', 'Pedagang Besar', 'Wiraswasta', 'Wirausaha', 'Buruh', 'Pensiunan', 'Meninggal Dunia'];
