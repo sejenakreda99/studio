@@ -1,28 +1,24 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Power } from 'lucide-react';
 import Link from 'next/link';
+import { UserPlus } from 'lucide-react';
 
 export default function DashboardPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold">Selamat Datang!</CardTitle>
-          <CardDescription className="text-center">
-            Anda telah berhasil login ke Portal Data Siswa.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4">
-          <p>Ini adalah halaman dashboard Anda.</p>
-          <Button asChild variant="destructive" className="mt-4">
-            <Link href="/login">
-              <Power className="mr-2 h-4 w-4" />
-              Logout
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
+    <div className="flex h-full flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm">
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h3 className="text-2xl font-bold tracking-tight">
+          Selamat Datang di Portal Data Siswa
+        </h3>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Anda dapat mulai dengan menambahkan data siswa baru atau mengelola data yang ada.
+        </p>
+        <Button asChild>
+          <Link href="/dashboard/add-student">
+            <UserPlus className="mr-2 h-4 w-4" />
+            Tambah Siswa Baru
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }
