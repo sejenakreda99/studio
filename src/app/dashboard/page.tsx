@@ -81,6 +81,8 @@ async function getStudents(): Promise<Student[]> {
         lingkarKepala: data.lingkarKepala || '',
         jumlahSaudaraKandung: data.jumlahSaudaraKandung || '',
         jumlahSaudaraTiri: data.jumlahSaudaraTiri || '',
+        hobi: data.hobi || '',
+        citaCita: data.citaCita || '',
       };
     });
 

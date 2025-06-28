@@ -102,6 +102,8 @@ export function AddStudentForm() {
       lingkarKepala: '',
       jumlahSaudaraKandung: '',
       jumlahSaudaraTiri: '',
+      hobi: '',
+      citaCita: '',
     },
   });
 
@@ -224,13 +226,12 @@ export function AddStudentForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <h2 className="text-2xl font-bold">Formulir Pendaftaran Siswa Baru</h2>
         <Tabs defaultValue="dataPribadi" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
                 <TabsTrigger value="dataPribadi">Data Pribadi</TabsTrigger>
                 <TabsTrigger value="dataAyah">Data Ayah</TabsTrigger>
                 <TabsTrigger value="dataIbu">Data Ibu</TabsTrigger>
                 <TabsTrigger value="dataWali">Data Wali</TabsTrigger>
                 <TabsTrigger value="kontak">Kontak</TabsTrigger>
-                <TabsTrigger value="dataLainnya">Data Lainnya</TabsTrigger>
             </TabsList>
 
             <TabsContent value="dataPribadi">
@@ -274,6 +275,21 @@ export function AddStudentForm() {
                         <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Tidak" /></FormControl><FormLabel className="font-normal">Tidak</FormLabel></FormItem>
                     </RadioGroup></FormControl><FormMessage /></FormItem>
                     )} />
+                    {renderInput('sekolahAsal', 'Asal Sekolah SMP/MTs', 'Nama sekolah sebelumnya')}
+                    {renderInput('tinggiBadan', 'Tinggi Badan (cm)', 'Contoh: 160', 'number')}
+                    {renderInput('beratBadan', 'Berat Badan (kg)', 'Contoh: 50', 'number')}
+                    {renderInput('lingkarKepala', 'Lingkar Kepala (cm)', 'Contoh: 55', 'number')}
+                    {renderInput('jumlahSaudaraKandung', 'Jumlah Saudara Kandung', 'Contoh: 2', 'number')}
+                    {renderInput('jumlahSaudaraTiri', 'Jumlah Saudara Tiri', 'Contoh: 1', 'number')}
+                     <FormItem>
+                        <FormLabel>Total Saudara</FormLabel>
+                        <FormControl>
+                            <Input value={totalSaudara} disabled className="bg-muted" />
+                        </FormControl>
+                        <FormDescription>Dihitung otomatis dari saudara kandung & tiri.</FormDescription>
+                    </FormItem>
+                    {renderInput('hobi', 'Hobi', 'Contoh: Membaca buku')}
+                    {renderInput('citaCita', 'Cita-cita', 'Contoh: Dokter')}
                     <div className="md:col-span-2 lg:col-span-3">
                     {renderCheckboxGroup('berkebutuhanKhusus', 'Berkebutuhan Khusus', kebutuhanKhususOptions)}
                     </div>
@@ -324,24 +340,6 @@ export function AddStudentForm() {
                     {renderInput('nomorTeleponRumah', 'Nomor Telepon Rumah', 'Milik pribadi/orang tua/wali')}
                     {renderInput('nomorHp', 'Nomor HP', 'Milik pribadi/orang tua/wali')}
                     {renderInput('email', 'Email', 'contoh@email.com', 'email')}
-                </div>
-            </TabsContent>
-
-            <TabsContent value="dataLainnya">
-                <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 pt-6">
-                    {renderInput('sekolahAsal', 'Asal Sekolah SMP/MTs', 'Nama sekolah sebelumnya')}
-                    {renderInput('tinggiBadan', 'Tinggi Badan (cm)', 'Contoh: 160', 'number')}
-                    {renderInput('beratBadan', 'Berat Badan (kg)', 'Contoh: 50', 'number')}
-                    {renderInput('lingkarKepala', 'Lingkar Kepala (cm)', 'Contoh: 55', 'number')}
-                    {renderInput('jumlahSaudaraKandung', 'Jumlah Saudara Kandung', 'Contoh: 2', 'number')}
-                    {renderInput('jumlahSaudaraTiri', 'Jumlah Saudara Tiri', 'Contoh: 1', 'number')}
-                     <FormItem>
-                        <FormLabel>Total Saudara</FormLabel>
-                        <FormControl>
-                            <Input value={totalSaudara} disabled className="bg-muted" />
-                        </FormControl>
-                        <FormDescription>Dihitung otomatis dari saudara kandung & tiri.</FormDescription>
-                    </FormItem>
                 </div>
             </TabsContent>
         </Tabs>

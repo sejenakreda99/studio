@@ -29,6 +29,14 @@ export const studentFormSchema = z.object({
   modaTransportasi: optionalString,
   anakKeberapa: optionalString,
   punyaKip: z.enum(['Ya', 'Tidak']).optional(),
+  sekolahAsal: optionalString,
+  tinggiBadan: optionalString,
+  beratBadan: optionalString,
+  lingkarKepala: optionalString,
+  jumlahSaudaraKandung: optionalString,
+  jumlahSaudaraTiri: optionalString,
+  hobi: optionalString,
+  citaCita: optionalString,
 
   // DATA AYAH KANDUNG
   namaAyah: z.string().min(1, 'Nama ayah harus diisi.'),
@@ -60,14 +68,6 @@ export const studentFormSchema = z.object({
   nomorTeleponRumah: optionalString,
   nomorHp: optionalString,
   email: z.string().email({ message: 'Email tidak valid.' }).optional().or(z.literal('')),
-
-  // DATA LAINNYA
-  sekolahAsal: optionalString,
-  tinggiBadan: optionalString,
-  beratBadan: optionalString,
-  lingkarKepala: optionalString,
-  jumlahSaudaraKandung: optionalString,
-  jumlahSaudaraTiri: optionalString,
 });
 
 export type StudentFormValues = z.infer<typeof studentFormSchema>;
