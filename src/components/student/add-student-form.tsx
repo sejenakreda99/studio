@@ -48,11 +48,53 @@ export function AddStudentForm() {
   const form = useForm<StudentFormValues>({
     resolver: zodResolver(studentFormSchema),
     defaultValues: {
-      kewarganegaraan: 'WNI',
-      berkebutuhanKhusus: [],
-      berkebutuhanKhususAyah: [],
-      berkebutuhanKhususIbu: [],
       tanggalRegistrasi: new Date(),
+      namaLengkap: '',
+      jenisKelamin: 'Laki-laki',
+      nisn: '',
+      nik: '',
+      noKk: '',
+      tempatLahir: '',
+      tanggalLahir: undefined,
+      noRegistrasiAktaLahir: '',
+      agama: undefined,
+      kewarganegaraan: 'WNI',
+      namaNegara: '',
+      berkebutuhanKhusus: [],
+      alamatJalan: '',
+      rt: '',
+      rw: '',
+      namaDusun: '',
+      namaKelurahanDesa: '',
+      kecamatan: '',
+      kodePos: '',
+      tempatTinggal: undefined,
+      modaTransportasi: undefined,
+      anakKeberapa: '',
+      punyaKip: undefined,
+      namaAyah: '',
+      nikAyah: '',
+      tahunLahirAyah: '',
+      pendidikanAyah: undefined,
+      pekerjaanAyah: undefined,
+      penghasilanAyah: undefined,
+      berkebutuhanKhususAyah: [],
+      namaIbu: '',
+      nikIbu: '',
+      tahunLahirIbu: '',
+      pendidikanIbu: undefined,
+      pekerjaanIbu: undefined,
+      penghasilanIbu: undefined,
+      berkebutuhanKhususIbu: [],
+      namaWali: '',
+      nikWali: '',
+      tahunLahirWali: '',
+      pendidikanWali: undefined,
+      pekerjaanWali: undefined,
+      penghasilanWali: undefined,
+      nomorTeleponRumah: '',
+      nomorHp: '',
+      email: '',
     },
   });
 
@@ -277,5 +319,7 @@ export function AddStudentForm() {
   );
 }
 
+
+    
 
     
