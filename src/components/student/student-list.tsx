@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { MoreHorizontal, UserPlus } from 'lucide-react';
 import {
@@ -36,26 +36,47 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { Student } from '@/types/student';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface StudentListProps {
   students: Student[];
-  onUpdateStatus: (studentId: string, status: string) => Promise<void>;
+  onUpdateStatus: (studentId: string, status: string, catatan?: string) => Promise<void>;
 }
 
 export function StudentList({ students, onUpdateStatus }: StudentListProps) {
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return '-';
-    // Manually parse yyyy-MM-dd to avoid timezone issues
-    const parts = dateString.split('-');
-    if (parts.length !== 3) return dateString;
-    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-    return new Intl.DateTimeFormat('id-ID', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(date);
+  const [dialogState, setDialogState] = useState<{ open: boolean; studentId: string | null }>({ open: false, studentId: null });
+  const [catatan, setCatatan] = useState('');
+
+  const handleOpenResiduDialog = (studentId: string) => {
+    const student = students.find(s => s.id === studentId);
+    setDialogState({ open: true, studentId });
+    setCatatan(student?.catatanValidasi || '');
   };
   
+  const handleSubmitResidu = async () => {
+    if (dialogState.studentId) {
+      await onUpdateStatus(dialogState.studentId, 'Residu', catatan);
+      setDialogState({ open: false, studentId: null });
+    }
+  };
+
   const unverifiedStudents = useMemo(() => students.filter(s => s.statusValidasi === 'Belum Diverifikasi' || !s.statusValidasi), [students]);
   const validStudents = useMemo(() => students.filter(s => s.statusValidasi === 'Valid'), [students]);
   const residualStudents = useMemo(() => students.filter(s => s.statusValidasi === 'Residu'), [students]);
@@ -99,12 +120,25 @@ export function StudentList({ students, onUpdateStatus }: StudentListProps) {
                 </Badge>
               </TableCell>
               <TableCell>
-                 <Badge variant={
+                 {student.statusValidasi === 'Residu' && student.catatanValidasi ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="destructive" className="cursor-help">{student.statusValidasi}</Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{student.catatanValidasi}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <Badge variant={
                     student.statusValidasi === 'Valid' ? 'default' : 
                     student.statusValidasi === 'Residu' ? 'destructive' : 'secondary'
                   }>
                     {student.statusValidasi}
                   </Badge>
+                )}
               </TableCell>
               <TableCell className="hidden md:table-cell">
                 {student.statusAnak && student.statusAnak !== 'Tidak' ? (
@@ -126,7 +160,7 @@ export function StudentList({ students, onUpdateStatus }: StudentListProps) {
                     <DropdownMenuItem onClick={() => onUpdateStatus(student.id, 'Valid')}>
                       Tandai Valid
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onUpdateStatus(student.id, 'Residu')}>
+                    <DropdownMenuItem onClick={() => handleOpenResiduDialog(student.id)}>
                       Tandai Residu
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -144,6 +178,7 @@ export function StudentList({ students, onUpdateStatus }: StudentListProps) {
   };
   
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -184,5 +219,32 @@ export function StudentList({ students, onUpdateStatus }: StudentListProps) {
         </Tabs>
       </CardContent>
     </Card>
+    <AlertDialog open={dialogState.open} onOpenChange={(open) => setDialogState({ ...dialogState, open })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tandai Siswa sebagai Residu</AlertDialogTitle>
+            <AlertDialogDescription>
+              Berikan alasan atau catatan mengapa data siswa ini ditandai sebagai residu. Catatan ini akan membantu untuk perbaikan data di kemudian hari.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="catatan-validasi">Catatan Validasi</Label>
+              <Textarea
+                id="catatan-validasi"
+                placeholder="Contoh: Nama ibu kandung di KK berbeda dengan di Akta Kelahiran."
+                value={catatan}
+                onChange={(e) => setCatatan(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDialogState({ open: false, studentId: null })}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSubmitResidu}>Simpan Catatan</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

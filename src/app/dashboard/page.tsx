@@ -88,6 +88,7 @@ async function getStudents(): Promise<Student[]> {
         hobi: data.hobi || '',
         citaCita: data.citaCita || '',
         statusValidasi: data.statusValidasi || 'Belum Diverifikasi',
+        catatanValidasi: data.catatanValidasi || null,
       };
     });
 
@@ -155,15 +156,26 @@ export default function DashboardPage() {
     return () => unsubscribe();
   }, [router]);
 
-  const handleUpdateStudentStatus = async (studentId: string, status: string) => {
+  const handleUpdateStudentStatus = async (studentId: string, status: string, catatan?: string) => {
     const studentRef = doc(db, 'students', studentId);
     try {
-      await updateDoc(studentRef, { statusValidasi: status });
+      const updateData: { statusValidasi: string; catatanValidasi?: string | null } = { statusValidasi: status };
+
+      if (status === 'Residu') {
+        updateData.catatanValidasi = catatan || null;
+      } else {
+        // Clear note if status is not 'Residu'
+        updateData.catatanValidasi = null;
+      }
+
+      await updateDoc(studentRef, updateData);
+      
       setStudents(prevStudents =>
         prevStudents.map(student =>
-          student.id === studentId ? { ...student, statusValidasi: status } : student
+          student.id === studentId ? { ...student, statusValidasi: status, catatanValidasi: updateData.catatanValidasi } : student
         )
       );
+
       toast({
         title: "Status Berhasil Diperbarui",
         description: `Status siswa telah diubah menjadi ${status}.`,

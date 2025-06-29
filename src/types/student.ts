@@ -7,4 +7,5 @@ export type Student = Omit<StudentFormValues, 'tanggalLahir' | 'tanggalRegistras
   tanggalLahir: string | null;
   tanggalRegistrasi: string | null;
   statusValidasi: string;
+  catatanValidasi: string | null;
 };

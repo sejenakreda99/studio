@@ -110,6 +110,7 @@ export function AddStudentForm() {
       hobi: '',
       citaCita: '',
       statusValidasi: 'Belum Diverifikasi',
+      catatanValidasi: '',
     },
   });
 

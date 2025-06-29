@@ -40,6 +40,7 @@ export const studentFormSchema = z.object({
   hobi: optionalString,
   citaCita: optionalString,
   statusValidasi: optionalString,
+  catatanValidasi: optionalString,
 
   // DATA AYAH KANDUNG
   namaAyah: optionalString,
@@ -67,7 +68,7 @@ export const studentFormSchema = z.object({
   tahunLahirWali: optionalString,
   pendidikanWali: z.string().optional(),
   pekerjaanWali: z.string().optional(),
-  penghasilanWali: optionalString,
+  penghasilanWali: z.string().optional(),
 
   // KONTAK
   nomorTeleponRumah: optionalString,
