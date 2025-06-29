@@ -18,6 +18,7 @@ import { updatePrintSettings } from '@/lib/settings-service';
 
 const settingsSchema = z.object({
   schoolLetterheadUrl: z.string().optional().nullable(),
+  academicYear: z.string().optional().nullable(),
   signaturePlace: z.string().min(1, 'Tempat tanda tangan harus diisi.'),
   committeeHeadTitle: z.string().min(1, 'Jabatan harus diisi.'),
   committeeHeadName: z.string().min(1, 'Nama lengkap harus diisi.'),
@@ -41,6 +42,7 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       schoolLetterheadUrl: initialData?.schoolLetterheadUrl || '',
+      academicYear: initialData?.academicYear || '2024/2025',
       signaturePlace: initialData?.signaturePlace || 'Naringgul',
       committeeHeadTitle: initialData?.committeeHeadTitle || 'Kepala SMAS PGRI Naringgul,',
       committeeHeadName: initialData?.committeeHeadName || 'H. SUTARDI, S.Pd',
@@ -166,6 +168,22 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
                       />
                     </div>
                   )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="academicYear"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tahun Pelajaran</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Contoh: 2024/2025" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormDescription>
+                    Tahun pelajaran yang akan ditampilkan pada header dokumen cetak.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

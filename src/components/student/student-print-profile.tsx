@@ -26,6 +26,7 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
 export function StudentPrintProfile({ student, settings }: { student: Student; settings: PrintSettings | null }) {
   const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   const signaturePlace = settings?.signaturePlace || "Naringgul";
+  const academicYear = settings?.academicYear || "2024/2025";
 
   let committeeIdDisplay = '';
   if (settings) {
@@ -62,69 +63,92 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
 
       <div className="text-center mb-4">
           <h3 className="text-base font-bold underline uppercase">PROFIL DATA POKOK SISWA</h3>
-          <p className="text-xs">Tahun Ajaran 2024/2025</p>
+          <p className="text-xs">Tahun Pelajaran {academicYear}</p>
       </div>
       
       <div className="flex justify-between gap-6">
-          <div className="w-3/4">
-              <SectionTitle>A. KETERANGAN PRIBADI SISWA</SectionTitle>
-              <DataField label="Nama Lengkap" value={student.namaLengkap} />
-              <DataField label="Jenis Kelamin" value={student.jenisKelamin} />
-              <DataField label="NIS" value={student.nis} />
-              <DataField label="NISN" value={student.nisn} />
-              <DataField label="NIK" value={student.nik} />
-              <DataField label="No. Kartu Keluarga" value={student.noKk} />
-              <DataField label="Tempat, Tgl Lahir" value={`${student.tempatLahir || ''}, ${student.tanggalLahir || ''}`} />
-              <DataField label="Agama" value={student.agama} />
-              <DataField label="Status Anak" value={student.statusAnak} />
-              <DataField label="Anak Ke-" value={student.anakKeberapa} />
-              <DataField label="Asal Sekolah" value={student.sekolahAsal} />
-              <DataField label="Kewarganegaraan" value={student.kewarganegaraan} />
-              
-              <SectionTitle>B. KETERANGAN TEMPAT TINGGAL</SectionTitle>
-              <DataField label="Alamat" value={student.alamatJalan} />
-              <DataField label="RT/RW" value={`${student.rt}/${student.rw}`} />
-              <DataField label="Dusun" value={student.namaDusun} />
-              <DataField label="Kelurahan/Desa" value={student.namaKelurahanDesa} />
-              <DataField label="Kecamatan" value={student.kecamatan} />
-              <DataField label="Kode Pos" value={student.kodePos} />
-              <DataField label="Tempat Tinggal" value={student.tempatTinggal} />
-              <DataField label="Moda Transportasi" value={student.modaTransportasi} />
-              
-              <SectionTitle>C. KONTAK</SectionTitle>
-              <DataField label="No. Telepon" value={student.nomorTeleponRumah} />
-              <DataField label="No. HP" value={student.nomorHp} />
-              <DataField label="Email" value={student.email} />
-          </div>
-          <div className="w-1/4">
-              <div className="w-32 h-40 border-2 border-gray-400 flex items-center justify-center text-gray-400 text-xs text-center mx-auto mt-6">
-                  Pas Foto 3x4
-              </div>
-              <SectionTitle>D. DATA ORANG TUA</SectionTitle>
-              <h4 className="font-semibold text-xs mb-1 underline">Data Ayah</h4>
-              <DataField label="Nama" value={student.namaAyah} />
-              <DataField label="Status" value={student.statusAyah} />
-              <DataField label="Pendidikan" value={student.pendidikanAyah} />
-              <DataField label="Pekerjaan" value={student.pekerjaanAyah} />
-              <DataField label="Penghasilan" value={student.penghasilanAyah} />
+        <div className="w-2/3">
+          <SectionTitle>A. KETERANGAN PRIBADI SISWA</SectionTitle>
+          <DataField label="Nama Lengkap" value={student.namaLengkap} />
+          <DataField label="Jenis Kelamin" value={student.jenisKelamin} />
+          <DataField label="NIS" value={student.nis} />
+          <DataField label="NISN" value={student.nisn} />
+          <DataField label="NIK" value={student.nik} />
+          <DataField label="No. Kartu Keluarga" value={student.noKk} />
+          <DataField label="Tempat, Tgl Lahir" value={`${student.tempatLahir || ''}, ${student.tanggalLahir || ''}`} />
+          <DataField label="No. Reg Akta Lahir" value={student.noRegistrasiAktaLahir} />
+          <DataField label="Agama" value={student.agama} />
+          <DataField label="Kewarganegaraan" value={student.kewarganegaraan} />
+          {student.kewarganegaraan === 'WNA' && <DataField label="Nama Negara" value={student.namaNegara} />}
+          <DataField label="Kebutuhan Khusus" value={student.berkebutuhanKhusus} />
+          <DataField label="Asal Sekolah" value={student.sekolahAsal} />
 
-              <h4 className="font-semibold text-xs mt-3 mb-1 underline">Data Ibu</h4>
-              <DataField label="Nama" value={student.namaIbu} />
-              <DataField label="Status" value={student.statusIbu} />
-              <DataField label="Pendidikan" value={student.pendidikanIbu} />
-              <DataField label="Pekerjaan" value={student.pekerjaanIbu} />
-              <DataField label="Penghasilan" value={student.penghasilanIbu} />
+          <SectionTitle>B. KETERANGAN TEMPAT TINGGAL</SectionTitle>
+          <DataField label="Alamat" value={student.alamatJalan} />
+          <DataField label="RT/RW" value={`${student.rt}/${student.rw}`} />
+          <DataField label="Dusun" value={student.namaDusun} />
+          <DataField label="Kelurahan/Desa" value={student.namaKelurahanDesa} />
+          <DataField label="Kecamatan" value={student.kecamatan} />
+          <DataField label="Kode Pos" value={student.kodePos} />
+          <DataField label="Tempat Tinggal" value={student.tempatTinggal} />
+          <DataField label="Moda Transportasi" value={student.modaTransportasi} />
 
-               {student.namaWali && (
-                  <>
-                  <SectionTitle>E. DATA WALI</SectionTitle>
-                  <DataField label="Nama" value={student.namaWali} />
-                  <DataField label="Pendidikan" value={student.pendidikanWali} />
-                  <DataField label="Pekerjaan" value={student.pekerjaanWali} />
-                  <DataField label="Penghasilan" value={student.penghasilanWali} />
-                  </>
-              )}
+          <SectionTitle>C. KETERANGAN KELUARGA</SectionTitle>
+          <DataField label="Status Anak" value={student.statusAnak} />
+          <DataField label="Anak Ke-" value={student.anakKeberapa} />
+          <DataField label="Jml. Saudara Kandung" value={student.jumlahSaudaraKandung} />
+          <DataField label="Jml. Saudara Tiri" value={student.jumlahSaudaraTiri} />
+
+          <SectionTitle>D. BANTUAN & LAINNYA</SectionTitle>
+          <DataField label="Punya KIP?" value={student.punyaKip} />
+          <DataField label="Hobi" value={student.hobi} />
+          <DataField label="Cita-cita" value={student.citaCita} />
+        </div>
+        <div className="w-1/3">
+          <div className="w-32 h-40 border-2 border-gray-400 flex items-center justify-center text-gray-400 text-xs text-center mx-auto mb-4">
+              Pas Foto 3x4
           </div>
+
+          <SectionTitle>E. DATA AYAH</SectionTitle>
+          <DataField label="Nama" value={student.namaAyah} />
+          <DataField label="Status" value={student.statusAyah} />
+          <DataField label="NIK" value={student.nikAyah} />
+          <DataField label="Tahun Lahir" value={student.tahunLahirAyah} />
+          <DataField label="Pendidikan" value={student.pendidikanAyah} />
+          <DataField label="Pekerjaan" value={student.pekerjaanAyah} />
+          <DataField label="Penghasilan" value={student.penghasilanAyah} />
+          <DataField label="Kebutuhan Khusus" value={student.berkebutuhanKhususAyah} />
+
+          <SectionTitle>F. DATA IBU</SectionTitle>
+          <DataField label="Nama" value={student.namaIbu} />
+          <DataField label="Status" value={student.statusIbu} />
+          <DataField label="NIK" value={student.nikIbu} />
+          <DataField label="Tahun Lahir" value={student.tahunLahirIbu} />
+          <DataField label="Pendidikan" value={student.pendidikanIbu} />
+          <DataField label="Pekerjaan" value={student.pekerjaanIbu} />
+          <DataField label="Penghasilan" value={student.penghasilanIbu} />
+          <DataField label="Kebutuhan Khusus" value={student.berkebutuhanKhususIbu} />
+          
+          {student.namaWali && (
+            <>
+              <SectionTitle>G. DATA WALI</SectionTitle>
+              <DataField label="Nama" value={student.namaWali} />
+              <DataField label="NIK" value={student.nikWali} />
+              <DataField label="Tahun Lahir" value={student.tahunLahirWali} />
+              <DataField label="Pendidikan" value={student.pendidikanWali} />
+              <DataField label="Pekerjaan" value={student.pekerjaanWali} />
+              <DataField label="Penghasilan" value={student.penghasilanWali} />
+            </>
+          )}
+
+          <SectionTitle>H. KONTAK & FISIK</SectionTitle>
+          <DataField label="No. Telepon" value={student.nomorTeleponRumah} />
+          <DataField label="No. HP" value={student.nomorHp} />
+          <DataField label="Email" value={student.email} />
+          <DataField label="Tinggi Badan (cm)" value={student.tinggiBadan} />
+          <DataField label="Berat Badan (kg)" value={student.beratBadan} />
+          <DataField label="Lingkar Kepala (cm)" value={student.lingkarKepala} />
+        </div>
       </div>
 
       <footer className="mt-8">
