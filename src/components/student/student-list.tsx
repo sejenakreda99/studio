@@ -46,12 +46,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
@@ -118,6 +112,7 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent }: Stude
             <TableHead className="hidden md:table-cell">NISN</TableHead>
             <TableHead className="hidden sm:table-cell">Jenis Kelamin</TableHead>
             <TableHead>Status Validasi</TableHead>
+            <TableHead>Catatan Residu</TableHead>
             <TableHead className="hidden md:table-cell">Status Anak</TableHead>
             <TableHead>
               <span className="sr-only">Aksi</span>
@@ -135,26 +130,14 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent }: Stude
                 </Badge>
               </TableCell>
               <TableCell>
-                 {student.statusValidasi === 'Residu' && student.catatanValidasi ? (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Badge variant="destructive" className="cursor-help">{student.statusValidasi}</Badge>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{student.catatanValidasi}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ) : (
-                  <Badge variant={
-                    student.statusValidasi === 'Valid' ? 'default' : 
-                    student.statusValidasi === 'Residu' ? 'destructive' : 'secondary'
-                  }>
-                    {student.statusValidasi}
-                  </Badge>
-                )}
+                <Badge variant={
+                  student.statusValidasi === 'Valid' ? 'default' : 
+                  student.statusValidasi === 'Residu' ? 'destructive' : 'secondary'
+                }>
+                  {student.statusValidasi}
+                </Badge>
               </TableCell>
+              <TableCell className="text-muted-foreground text-xs">{student.catatanValidasi || '-'}</TableCell>
               <TableCell className="hidden md:table-cell">
                 {student.statusAnak && student.statusAnak !== 'Tidak' ? (
                   <Badge variant="destructive">{student.statusAnak}</Badge>
