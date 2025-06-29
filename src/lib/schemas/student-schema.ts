@@ -1,24 +1,35 @@
 
 import * as z from 'zod';
 
-const optionalString = z.string().optional().or(z.literal(''));
+const optionalString = z.string().optional().nullable();
+
+// Custom refinement for NIK: must be 16 digits or empty/null.
+const nikSchema = z.string().refine((val) => !val || val.length === 16, {
+  message: 'NIK harus 16 digit.',
+}).optional().nullable();
+
+// Custom refinement for email: must be a valid email format or empty/null.
+const emailSchema = z.string().refine((val) => !val || z.string().email().safeParse(val).success, {
+  message: 'Email tidak valid.',
+}).optional().nullable();
+
 
 export const studentFormSchema = z.object({
   // DATA PRIBADI
   tanggalRegistrasi: z.date({ required_error: 'Tanggal registrasi harus diisi.' }),
   namaLengkap: z.string().min(1, 'Nama lengkap harus diisi.'),
-  jenisKelamin: z.enum(['Laki-laki', 'Perempuan']).optional(),
-  nisn: z.string().max(10, 'NISN maksimal 10 digit.').optional().or(z.literal('')),
+  jenisKelamin: z.enum(['Laki-laki', 'Perempuan']).optional().nullable(),
+  nisn: z.string().max(10, 'NISN maksimal 10 digit.').optional().nullable(),
   nis: optionalString,
-  nik: z.string().length(16, 'NIK harus 16 digit.').optional().or(z.literal('')),
+  nik: nikSchema,
   noKk: optionalString,
   tempatLahir: optionalString,
-  tanggalLahir: z.date().optional(),
+  tanggalLahir: z.date().optional().nullable(),
   noRegistrasiAktaLahir: optionalString,
-  agama: z.string().optional(),
-  kewarganegaraan: z.enum(['WNI', 'WNA']).optional(),
+  agama: z.string().optional().nullable(),
+  kewarganegaraan: z.enum(['WNI', 'WNA']).optional().nullable(),
   namaNegara: optionalString,
-  berkebutuhanKhusus: z.array(z.string()).optional(),
+  berkebutuhanKhusus: z.array(z.string()).optional().nullable(),
   alamatJalan: optionalString,
   rt: optionalString,
   rw: optionalString,
@@ -26,11 +37,11 @@ export const studentFormSchema = z.object({
   namaKelurahanDesa: optionalString,
   kecamatan: optionalString,
   kodePos: optionalString,
-  tempatTinggal: z.string().optional(),
-  modaTransportasi: z.string().optional(),
+  tempatTinggal: z.string().optional().nullable(),
+  modaTransportasi: z.string().optional().nullable(),
   anakKeberapa: optionalString,
-  statusAnak: z.string().optional(),
-  punyaKip: z.enum(['Ya', 'Tidak']).optional(),
+  statusAnak: z.string().optional().nullable(),
+  punyaKip: z.enum(['Ya', 'Tidak']).optional().nullable(),
   sekolahAsal: optionalString,
   tinggiBadan: optionalString,
   beratBadan: optionalString,
@@ -44,36 +55,36 @@ export const studentFormSchema = z.object({
 
   // DATA AYAH KANDUNG
   namaAyah: optionalString,
-  statusAyah: z.string().optional(),
-  nikAyah: z.string().length(16, 'NIK Ayah harus 16 digit.').optional().or(z.literal('')),
+  statusAyah: z.string().optional().nullable(),
+  nikAyah: nikSchema,
   tahunLahirAyah: optionalString,
-  pendidikanAyah: z.string().optional(),
-  pekerjaanAyah: z.string().optional(),
-  penghasilanAyah: z.string().optional(),
-  berkebutuhanKhususAyah: z.array(z.string()).optional(),
+  pendidikanAyah: z.string().optional().nullable(),
+  pekerjaanAyah: z.string().optional().nullable(),
+  penghasilanAyah: z.string().optional().nullable(),
+  berkebutuhanKhususAyah: z.array(z.string()).optional().nullable(),
 
   // DATA IBU KANDUNG
   namaIbu: optionalString,
-  statusIbu: z.string().optional(),
-  nikIbu: z.string().length(16, 'NIK Ibu harus 16 digit.').optional().or(z.literal('')),
+  statusIbu: z.string().optional().nullable(),
+  nikIbu: nikSchema,
   tahunLahirIbu: optionalString,
-  pendidikanIbu: z.string().optional(),
-  pekerjaanIbu: z.string().optional(),
-  penghasilanIbu: z.string().optional(),
-  berkebutuhanKhususIbu: z.array(z.string()).optional(),
+  pendidikanIbu: z.string().optional().nullable(),
+  pekerjaanIbu: z.string().optional().nullable(),
+  penghasilanIbu: z.string().optional().nullable(),
+  berkebutuhanKhususIbu: z.array(z.string()).optional().nullable(),
   
   // DATA WALI
   namaWali: optionalString,
-  nikWali: z.string().length(16, 'NIK Wali harus 16 digit.').optional().or(z.literal('')),
+  nikWali: nikSchema,
   tahunLahirWali: optionalString,
-  pendidikanWali: z.string().optional(),
-  pekerjaanWali: z.string().optional(),
-  penghasilanWali: z.string().optional(),
+  pendidikanWali: z.string().optional().nullable(),
+  pekerjaanWali: z.string().optional().nullable(),
+  penghasilanWali: z.string().optional().nullable(),
 
   // KONTAK
   nomorTeleponRumah: optionalString,
   nomorHp: optionalString,
-  email: z.string().email({ message: 'Email tidak valid.' }).optional().or(z.literal('')),
+  email: emailSchema,
 });
 
 export type StudentFormValues = z.infer<typeof studentFormSchema>;
