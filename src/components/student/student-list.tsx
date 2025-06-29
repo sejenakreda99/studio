@@ -396,8 +396,9 @@ export function StudentList({
             <TableHead>Status Validasi</TableHead>
             <TableHead>Catatan Residu</TableHead>
             <TableHead className="hidden md:table-cell">Status Anak</TableHead>
+            <TableHead>Aksi</TableHead>
             <TableHead>
-              <span className="sr-only">Aksi</span>
+              <span className="sr-only">Cetak</span>
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -456,17 +457,19 @@ export function StudentList({
                     <DropdownMenuItem onClick={() => router.push(`/dashboard/edit-student/${student.id}`)}>
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-                      <Link href={`/dashboard/print-student/${student.id}`} target="_blank">
-                        <Printer className="mr-2 h-4 w-4" />
-                        Cetak/Unduh PDF
-                      </Link>
-                    </DropdownMenuItem>
                     <DropdownMenuItem className="text-destructive focus:bg-destructive focus:text-destructive-foreground" onClick={() => handleOpenDeleteDialog(student.id, student.namaLengkap)}>
                       Hapus
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+              </TableCell>
+               <TableCell>
+                <Button asChild variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                    <Link href={`/dashboard/print-student/${student.id}`} target="_blank" title="Cetak Profil Siswa">
+                        <Printer className="h-4 w-4" />
+                        <span className="sr-only">Cetak Profil</span>
+                    </Link>
+                </Button>
               </TableCell>
             </TableRow>
           ))}
@@ -505,6 +508,12 @@ export function StudentList({
                 <Button variant="outline" onClick={() => handleExportToExcel()}>
                     <Upload className="mr-2 h-4 w-4" />
                     Ekspor
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/dashboard/print-all-students" target="_blank">
+                      <Printer className="mr-2 h-4 w-4" />
+                      Cetak Semua
+                  </Link>
                 </Button>
                 <Button asChild>
                     <Link href="/dashboard/add-student">

@@ -95,4 +95,10 @@ body {
   body {
     background: #fff !important;
   }
+  .page-break-after {
+    page-break-after: always;
+  }
+  .page-break-after:last-child {
+    page-break-after: avoid;
+  }
 }
