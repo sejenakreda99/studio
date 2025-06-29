@@ -15,7 +15,7 @@ export default function DashboardLayout({
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <School className="h-6 w-6" />
             </div>
-            <span className="text-lg font-semibold">Data Siswa</span>
+            <span className="text-lg font-semibold">SDS PGRI Naringgul</span>
           </div>
         </SidebarHeader>
         <SidebarContent>

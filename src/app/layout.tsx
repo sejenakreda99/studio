@@ -3,8 +3,8 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "Data Siswa Portal",
-  description: "Portal data siswa untuk administrasi sekolah.",
+  title: "SDS SMAS PGRI NARINGGUL",
+  description: "Sistem Database Siswa SMAS PGRI Naringgul.",
 };
 
 export default function RootLayout({

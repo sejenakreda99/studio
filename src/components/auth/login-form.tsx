@@ -70,7 +70,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
         <CardDescription>
-          Silakan masuk untuk mengakses portal data siswa.
+          Silakan masuk untuk mengakses Sistem Database Siswa.
         </CardDescription>
       </CardHeader>
       <CardContent>

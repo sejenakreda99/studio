@@ -10,7 +10,7 @@ export default function LoginPage() {
             <School className="h-7 w-7" />
           </div>
           <h1 className="text-xl font-bold text-foreground sm:text-2xl">
-            Data Siswa Portal
+            SDS SMAS PGRI NARINGGUL
           </h1>
         </div>
       </header>
@@ -19,7 +19,7 @@ export default function LoginPage() {
       </main>
       <footer className="flex h-16 items-center justify-center border-t bg-card px-4 text-center">
         <p className="text-sm text-muted-foreground">
-          2025 &copy; Hak Cipta Dilindungi. Created by KS.
+          2025 &copy; Hak Cipta Dilindungi. Dibuat oleh SMAS PGRI Naringgul.
         </p>
       </footer>
     </div>
