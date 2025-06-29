@@ -233,6 +233,12 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent }: Stude
       return { wch: maxLength + 2 };
     });
     worksheet['!cols'] = colWidths;
+    
+    // Add AutoFilter
+    const headerRowIndex = 3; // The row with field headers (Nama Lengkap, NISN, etc.)
+    const lastCol = XLSX.utils.encode_col(columns.length - 1);
+    worksheet['!autofilter'] = { ref: `A${headerRowIndex + 1}:${lastCol}${excelData.length}` };
+
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Siswa");
     XLSX.writeFile(workbook, "Data_Siswa.xlsx");
@@ -424,5 +430,3 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent }: Stude
     </>
   );
 }
-
-    
