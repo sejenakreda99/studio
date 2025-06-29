@@ -178,7 +178,7 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
               onSelect={field.onChange}
               disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
               initialFocus
-              captionLayout={name === 'tanggalLahir' ? "dropdown-buttons" : undefined}
+              captionLayout={name === 'tanggalLahir' ? "dropdown" : "buttons"}
               fromYear={name === 'tanggalLahir' ? 1950 : undefined}
               toYear={name === 'tanggalLahir' ? new Date().getFullYear() : undefined}
             />
