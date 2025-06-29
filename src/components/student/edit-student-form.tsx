@@ -331,7 +331,7 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
            <Link href={`/dashboard/print-student/${student.id}`} target="_blank" passHref>
              <Button type="button" variant="outline" size="lg">
                 <Printer className="mr-2 h-4 w-4"/>
-                Cetak Profil
+                Cetak/Unduh Profil
              </Button>
            </Link>
           <Button type="submit" size="lg" disabled={isLoading}>
