@@ -1,5 +1,6 @@
 
 import { LoginForm } from '@/components/auth/login-form';
+import { FirebaseGate } from '@/components/firebase-gate';
 import { School } from 'lucide-react';
 
 export default function LoginPage() {
@@ -16,7 +17,9 @@ export default function LoginPage() {
         </div>
       </header>
       <main className="flex flex-1 items-center justify-center p-4 sm:p-6">
-        <LoginForm />
+        <FirebaseGate>
+          <LoginForm />
+        </FirebaseGate>
       </main>
       <footer className="flex h-16 items-center justify-center border-t bg-card px-4 text-center">
         <p className="text-sm text-muted-foreground">

@@ -33,6 +33,10 @@ export default function PrintAllStudentsPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (!auth) {
+      setIsAuthenticated(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAuthenticated(!!user);
     });

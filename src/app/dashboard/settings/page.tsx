@@ -40,12 +40,26 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState<PrintSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setIsLoading(true);
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setIsAuthenticated(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated === null) return;
+
+    if (!isAuthenticated) {
+        router.push('/login');
+        return;
+    }
+    
+    const fetchSettings = async () => {
         setError(null);
         try {
           const settingsData = await getPrintSettings();
@@ -56,14 +70,13 @@ export default function SettingsPage() {
         } finally {
           setIsLoading(false);
         }
-      } else {
-        router.push('/login');
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
+    };
+    
+    fetchSettings();
+  }, [isAuthenticated, router]);
 
-  if (isLoading) {
+
+  if (isLoading || isAuthenticated === null) {
     return <SettingsSkeleton />;
   }
 

@@ -49,7 +49,7 @@ export function LoginForm() {
     setIsLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await signInWithEmailAndPassword(auth!, values.email, values.password);
       toast({
         title: "Login Berhasil",
         description: "Selamat datang, Admin!",

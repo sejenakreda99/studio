@@ -4,6 +4,10 @@ import type { Student } from '@/types/student';
 import { db } from './firebase';
 
 export async function getStudents(): Promise<Student[]> {
+  if (!db) {
+    console.error("Firestore is not initialized, cannot fetch students.");
+    return [];
+  }
   try {
     const studentsCollection = collection(db, 'students');
     const q = query(studentsCollection, orderBy('tanggalRegistrasi', 'desc'));

@@ -49,11 +49,11 @@ function StudentListPageContent() {
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const router = useRouter();
   const { toast } = useToast();
 
   const fetchStudents = async () => {
-    setIsLoading(true);
     setError(null);
     try {
       const studentData = await getStudents();
@@ -67,19 +67,26 @@ function StudentListPageContent() {
   };
 
   useEffect(() => {
+    if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        fetchStudents();
-      } else {
-        router.push('/login');
-      }
+        setIsAuthenticated(!!user);
     });
-
     return () => unsubscribe();
-  }, [router]);
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated === null) return;
+    
+    if (isAuthenticated) {
+        fetchStudents();
+    } else {
+        router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+
 
   const handleUpdateStudentStatus = async (studentId: string, status: string, catatan?: string) => {
-    const studentRef = doc(db, 'students', studentId);
+    const studentRef = doc(db!, 'students', studentId);
     try {
       const updateData: { statusValidasi: string; catatanValidasi?: string | null } = { statusValidasi: status };
 
@@ -112,7 +119,7 @@ function StudentListPageContent() {
   };
 
   const handleDeleteStudent = async (studentId: string) => {
-    const studentRef = doc(db, 'students', studentId);
+    const studentRef = doc(db!, 'students', studentId);
     try {
         await deleteDoc(studentRef);
         setStudents(prevStudents => prevStudents.filter(student => student.id !== studentId));
@@ -137,9 +144,9 @@ function StudentListPageContent() {
     });
 
     try {
-      const batch = writeBatch(db);
+      const batch = writeBatch(db!);
       newStudents.forEach(studentData => {
-        const studentRef = doc(collection(db, 'students'));
+        const studentRef = doc(collection(db!, 'students'));
         
         const processedData: { [key: string]: any } = {
           ...studentData,
@@ -182,9 +189,9 @@ function StudentListPageContent() {
     });
 
     try {
-      const batch = writeBatch(db);
+      const batch = writeBatch(db!);
       studentIds.forEach(id => {
-        const studentRef = doc(db, 'students', id);
+        const studentRef = doc(db!, 'students', id);
         batch.delete(studentRef);
       });
       await batch.commit();
@@ -213,9 +220,9 @@ function StudentListPageContent() {
     });
 
     try {
-      const batch = writeBatch(db);
+      const batch = writeBatch(db!);
       studentIds.forEach(id => {
-        const studentRef = doc(db, 'students', id);
+        const studentRef = doc(db!, 'students', id);
         batch.update(studentRef, { statusValidasi: status, catatanValidasi: null });
       });
       await batch.commit();
@@ -238,7 +245,7 @@ function StudentListPageContent() {
   };
 
 
-  if (isLoading) {
+  if (isLoading || isAuthenticated === null) {
     return <StudentListSkeleton />;
   }
 

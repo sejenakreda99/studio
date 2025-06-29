@@ -10,6 +10,7 @@ import { db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -21,7 +22,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { CalendarIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon, Loader2, Printer } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Student } from '@/types/student';
 
@@ -87,7 +88,7 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
   async function onSubmit(data: StudentFormValues) {
     setIsLoading(true);
     try {
-      const studentDocRef = doc(db, 'students', student.id);
+      const studentDocRef = doc(db!, 'students', student.id);
       const processedData: { [key: string]: any } = {
         ...data,
         tanggalRegistrasi: data.tanggalRegistrasi ? format(data.tanggalRegistrasi, 'yyyy-MM-dd') : null,
@@ -324,6 +325,12 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
         </Tabs>
         
         <div className="flex justify-end gap-4 mt-6">
+           <Button asChild variant="outline" size="lg">
+              <Link href={`/dashboard/print-student/${student.id}`} target="_blank">
+                  <Printer className="mr-2 h-4 w-4" />
+                  Cetak/Unduh PDF
+              </Link>
+            </Button>
           <Button type="button" variant="outline" size="lg" onClick={() => router.back()}>
             Batal
           </Button>

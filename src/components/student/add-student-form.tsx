@@ -144,7 +144,7 @@ export function AddStudentForm() {
         }
       }
 
-      await addDoc(collection(db, 'students'), processedData);
+      await addDoc(collection(db!, 'students'), processedData);
       toast({
         title: 'Sukses',
         description: 'Data siswa baru berhasil disimpan.',

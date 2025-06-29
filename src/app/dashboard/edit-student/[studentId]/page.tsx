@@ -44,7 +44,7 @@ export default function EditStudentPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!studentId) return;
+    if (!studentId || !db) return;
 
     const fetchStudent = async () => {
       setIsLoading(true);

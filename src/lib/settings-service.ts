@@ -7,6 +7,7 @@ const settingsCollectionRef = 'print_settings';
 const defaultSettingsDocId = 'default';
 
 export async function getPrintSettings(): Promise<PrintSettings | null> {
+  if (!db) return null;
   try {
     const settingsDocRef = doc(db, settingsCollectionRef, defaultSettingsDocId);
     const docSnap = await getDoc(settingsDocRef);
@@ -24,6 +25,9 @@ export async function getPrintSettings(): Promise<PrintSettings | null> {
 }
 
 export async function updatePrintSettings(settings: Partial<PrintSettings>): Promise<void> {
+  if (!db) {
+    throw new Error("Firestore is not initialized.");
+  }
   try {
     const settingsDocRef = doc(db, settingsCollectionRef, defaultSettingsDocId);
     // Use setDoc with merge: true to create or update the document

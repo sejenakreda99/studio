@@ -55,12 +55,26 @@ export default function ReportsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setIsLoading(true);
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setIsAuthenticated(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated === null) return;
+
+    if (!isAuthenticated) {
+        router.push('/login');
+        return;
+    }
+
+    const fetchStudents = async () => {
         setError(null);
         try {
           const studentData = await getStudents();
@@ -71,14 +85,13 @@ export default function ReportsPage() {
         } finally {
           setIsLoading(false);
         }
-      } else {
-        router.push('/login');
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
+    };
+    
+    fetchStudents();
+  }, [isAuthenticated, router]);
 
-  if (isLoading) {
+
+  if (isLoading || isAuthenticated === null) {
     return <ReportsSkeleton />;
   }
 

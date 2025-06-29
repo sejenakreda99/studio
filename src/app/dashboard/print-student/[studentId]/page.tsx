@@ -11,7 +11,6 @@ import { db, auth } from '@/lib/firebase';
 import type { Student } from '@/types/student';
 import type { PrintSettings } from '@/types/settings';
 import { getPrintSettings } from '@/lib/settings-service';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { StudentPrintProfile } from '@/components/student/student-print-profile';
@@ -36,6 +35,10 @@ export default function PrintStudentPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (!auth) {
+      setIsAuthenticated(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsAuthenticated(!!user);
     });
@@ -51,7 +54,7 @@ export default function PrintStudentPage() {
       return;
     }
 
-    if (!studentId) {
+    if (!studentId || !db) {
       setError("ID Siswa tidak valid.");
       setIsLoading(false);
       return;
