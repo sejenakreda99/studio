@@ -6,8 +6,10 @@ import type { Student } from '@/types/student';
 import { Bar, BarChart, CartesianGrid, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { differenceInDays, startOfMonth } from 'date-fns';
-import { Users, UserCheck, UserX, Users2, FileBarChart, PieChartIcon } from 'lucide-react';
+import { startOfMonth } from 'date-fns';
+import { Users, UserCheck, UserX, Users2, FileBarChart, PieChartIcon, FileCheck } from 'lucide-react';
+import { studentFormSchema } from '@/lib/schemas/student-schema';
+
 
 interface StatsDashboardProps {
   students: Student[];
@@ -15,6 +17,22 @@ interface StatsDashboardProps {
 
 const GENDER_COLORS = { 'Laki-laki': 'hsl(var(--chart-1))', 'Perempuan': 'hsl(var(--chart-2))' };
 const STATUS_COLORS = { 'Valid': 'hsl(var(--chart-1))', 'Residu': 'hsl(var(--chart-5))', 'Belum Diverifikasi': 'hsl(var(--chart-3))' };
+const COMPLETENESS_COLORS = { 'Lengkap (>80%)': 'hsl(var(--chart-2))', 'Cukup (50-80%)': 'hsl(var(--chart-4))', 'Kurang (<50%)': 'hsl(var(--chart-5))' };
+
+const totalFields = Object.keys(studentFormSchema.shape).length;
+
+const calculateCompleteness = (student: Student): number => {
+    let filledFields = 0;
+    for (const key in student) {
+        if (Object.prototype.hasOwnProperty.call(studentFormSchema.shape, key)) {
+            const value = student[key as keyof Student];
+            if (value !== null && value !== undefined && value !== '' && (!Array.isArray(value) || value.length > 0)) {
+                filledFields++;
+            }
+        }
+    }
+    return (filledFields / totalFields) * 100;
+};
 
 
 export function StatsDashboard({ students }: StatsDashboardProps) {
@@ -28,6 +46,9 @@ export function StatsDashboard({ students }: StatsDashboardProps) {
     let male = 0;
     let female = 0;
     let newThisMonth = 0;
+    let lengkap = 0;
+    let cukup = 0;
+    let kurang = 0;
 
     students.forEach(student => {
       // Validation Status
@@ -46,6 +67,12 @@ export function StatsDashboard({ students }: StatsDashboardProps) {
           newThisMonth++;
         }
       }
+
+      // Data Completeness
+      const completeness = calculateCompleteness(student);
+      if (completeness > 80) lengkap++;
+      else if (completeness >= 50) cukup++;
+      else kurang++;
     });
 
     return {
@@ -55,13 +82,18 @@ export function StatsDashboard({ students }: StatsDashboardProps) {
       unverified,
       newThisMonth,
       genderData: [
-        { name: 'Laki-laki', total: male },
-        { name: 'Perempuan', total: female },
+        { name: 'Laki-laki', total: male, fill: GENDER_COLORS['Laki-laki'] },
+        { name: 'Perempuan', total: female, fill: GENDER_COLORS['Perempuan'] },
       ],
       validationData: [
         { name: 'Valid', value: valid, fill: STATUS_COLORS['Valid'] },
         { name: 'Residu', value: residu, fill: STATUS_COLORS['Residu'] },
         { name: 'Belum Diverifikasi', value: unverified, fill: STATUS_COLORS['Belum Diverifikasi'] },
+      ],
+      completenessData: [
+        { name: 'Lengkap (>80%)', total: lengkap, fill: COMPLETENESS_COLORS['Lengkap (>80%)'] },
+        { name: 'Cukup (50-80%)', total: cukup, fill: COMPLETENESS_COLORS['Cukup (50-80%)'] },
+        { name: 'Kurang (<50%)', total: kurang, fill: COMPLETENESS_COLORS['Kurang (<50%)'] },
       ],
     };
   }, [students]);
@@ -111,8 +143,8 @@ export function StatsDashboard({ students }: StatsDashboardProps) {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-12 lg:col-span-4">
+      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+        <Card className="col-span-1">
           <CardHeader>
              <div className="flex items-center gap-2">
                 <FileBarChart className="h-5 w-5 text-muted-foreground" />
@@ -129,14 +161,38 @@ export function StatsDashboard({ students }: StatsDashboardProps) {
                 <Tooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                 <Bar dataKey="total" radius={8}>
                     {stats.genderData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={GENDER_COLORS[entry.name as keyof typeof GENDER_COLORS]} />
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                 </Bar>
               </BarChart>
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="col-span-12 lg:col-span-3">
+         <Card className="col-span-1">
+          <CardHeader>
+             <div className="flex items-center gap-2">
+                <FileCheck className="h-5 w-5 text-muted-foreground" />
+                <CardTitle>Kelengkapan Data</CardTitle>
+            </div>
+            <CardDescription>Distribusi siswa berdasarkan kelengkapan data.</CardDescription>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <ChartContainer config={{}} className="h-[300px] w-full">
+              <BarChart accessibilityLayer data={stats.completenessData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
+                <YAxis />
+                <Tooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                <Bar dataKey="total" radius={8}>
+                    {stats.completenessData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+        <Card className="col-span-1">
           <CardHeader>
              <div className="flex items-center gap-2">
                 <PieChartIcon className="h-5 w-5 text-muted-foreground" />
