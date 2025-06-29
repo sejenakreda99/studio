@@ -1,4 +1,7 @@
 
+'use client';
+
+import { usePathname } from 'next/navigation';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { School, UserPlus, Power, Users, LayoutDashboard, BarChartHorizontal } from "lucide-react";
 import Link from 'next/link';
@@ -8,6 +11,12 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  if (pathname.startsWith('/dashboard/print-student')) {
+    return <>{children}</>;
+  }
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -16,7 +25,7 @@ export default function DashboardLayout({
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <School className="h-6 w-6" />
             </div>
-            <span className="text-lg font-semibold">SDS PGRI Naringgul</span>
+            <span className="text-lg font-semibold">SDS SMAS PGRI NARINGGUL</span>
           </div>
         </SidebarHeader>
         <SidebarContent>

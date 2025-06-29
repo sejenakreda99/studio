@@ -3,10 +3,11 @@
 
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { MoreHorizontal, UserPlus, FileDown, Upload, FileUp, Search, CalendarIcon, Trash2, CheckCircle, ChevronDown } from 'lucide-react';
+import { MoreHorizontal, UserPlus, FileDown, Upload, FileUp, Search, CalendarIcon, Trash2, CheckCircle, ChevronDown, Printer } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { DateRange } from "react-day-picker";
 import { format, isAfter, isBefore, isEqual } from 'date-fns';
+import Link from 'next/link';
 
 import {
   Table,
@@ -53,7 +54,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
@@ -453,8 +453,18 @@ export function StudentList({
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuLabel>Manajemen</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => router.push(`/dashboard/edit-student/${student.id}`)}>Edit</DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive focus:bg-destructive focus:text-destructive-foreground" onClick={() => handleOpenDeleteDialog(student.id, student.namaLengkap)}>Hapus</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push(`/dashboard/edit-student/${student.id}`)}>
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+                      <Link href={`/dashboard/print-student/${student.id}`} target="_blank">
+                        <Printer className="mr-2 h-4 w-4" />
+                        Cetak/Unduh PDF
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive focus:bg-destructive focus:text-destructive-foreground" onClick={() => handleOpenDeleteDialog(student.id, student.namaLengkap)}>
+                      Hapus
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
