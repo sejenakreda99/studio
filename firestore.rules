@@ -12,5 +12,10 @@ service cloud.firestore {
     match /students/{studentId} {
       allow read, write: if request.auth != null;
     }
+
+    // Allow authenticated users to manage print settings.
+    match /print_settings/{settingsId} {
+      allow read, write: if request.auth != null;
+    }
   }
 }
