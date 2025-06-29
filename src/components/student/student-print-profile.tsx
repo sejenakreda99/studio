@@ -75,70 +75,68 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
           <p className="text-xs">Tahun Pelajaran {academicYear}</p>
       </div>
       
-      <div className="grid grid-cols-2 gap-x-8">
-        <SectionTitle>A. DATA PRIBADI</SectionTitle>
-      </div>
-
-      <div className="flex flex-row gap-6 items-start">
-        <div className="w-4/5">
-            <div className="grid grid-cols-2 gap-x-8">
-                {/* Left Column */}
-                <DataSection>
-                    <DataField label="Nama Lengkap" value={student.namaLengkap} />
-                    <DataField label="Jenis Kelamin" value={student.jenisKelamin} />
-                    <DataField label="NIS" value={student.nis} />
-                    <DataField label="NISN" value={student.nisn} />
-                    <DataField label="NIK" value={student.nik} />
-                    <DataField label="No. Kartu Keluarga" value={student.noKk} />
-                    <DataField label="Tempat, Tanggal Lahir" value={`${student.tempatLahir || '-'}, ${student.tanggalLahir || '-'}`} />
-                    <DataField label="No. Registrasi Akta Lahir" value={student.noRegistrasiAktaLahir} />
-                    <DataField label="Agama" value={student.agama} />
-                    <DataField label="Kewarganegaraan" value={student.kewarganegaraan} />
-                    {student.kewarganegaraan === 'WNA' && <DataField label="Nama Negara" value={student.namaNegara} />}
-                </DataSection>
-                {/* Right Column */}
-                <DataSection>
-                    <DataField label="Alamat Jalan" value={student.alamatJalan} />
-                    <DataField label="RT / RW" value={`${student.rt || '-'} / ${student.rw || '-'}`} />
-                    <DataField label="Dusun" value={student.namaDusun} />
-                    <DataField label="Kelurahan / Desa" value={student.namaKelurahanDesa} />
-                    <DataField label="Kecamatan" value={student.kecamatan} />
-                    <DataField label="Kode Pos" value={student.kodePos} />
-                    <DataField label="Tempat Tinggal" value={student.tempatTinggal} />
-                    <DataField label="Moda Transportasi" value={student.modaTransportasi} />
-                    <DataField label="Status Anak" value={student.statusAnak} />
-                    <DataField label="Anak Ke-" value={student.anakKeberapa} />
-                    <DataField label="Punya KIP?" value={student.punyaKip} />
-                </DataSection>
-            </div>
-             <div className="grid grid-cols-2 gap-x-8 mt-2">
-                 <DataSection>
-                     <DataField label="Jumlah Saudara Kandung" value={student.jumlahSaudaraKandung} />
-                     <DataField label="Tinggi Badan (cm)" value={student.tinggiBadan} />
-                     <DataField label="Lingkar Kepala (cm)" value={student.lingkarKepala} />
-                     <DataField label="Hobi" value={student.hobi} />
-                 </DataSection>
-                 <DataSection>
-                     <DataField label="Jumlah Saudara Tiri" value={student.jumlahSaudaraTiri} />
-                     <DataField label="Berat Badan (kg)" value={student.beratBadan} />
-                     <DataField label="Asal Sekolah (SMP/MTs)" value={student.sekolahAsal} />
-                     <DataField label="Cita-cita" value={student.citaCita} />
-                 </DataSection>
-            </div>
-             <DataSection className="mt-2">
-                <DataField label="Berkebutuhan Khusus Siswa" value={student.berkebutuhanKhusus} />
-            </DataSection>
+      <SectionTitle>A. DATA PRIBADI</SectionTitle>
+      <div className="flex flex-row items-start gap-x-8">
+        <div className="flex-1">
+          <div className="grid grid-cols-2 gap-x-8">
+              <DataSection>
+                  <DataField label="Nama Lengkap" value={student.namaLengkap} />
+                  <DataField label="Jenis Kelamin" value={student.jenisKelamin} />
+                  <DataField label="NIS" value={student.nis} />
+                  <DataField label="NISN" value={student.nisn} />
+                  <DataField label="NIK" value={student.nik} />
+                  <DataField label="No. Kartu Keluarga" value={student.noKk} />
+                  <DataField label="Tempat, Tanggal Lahir" value={`${student.tempatLahir || '-'}, ${student.tanggalLahir || '-'}`} />
+                  <DataField label="No. Registrasi Akta Lahir" value={student.noRegistrasiAktaLahir} />
+                  <DataField label="Agama" value={student.agama} />
+                  <DataField label="Kewarganegaraan" value={student.kewarganegaraan} />
+                  {student.kewarganegaraan === 'WNA' && <DataField label="Nama Negara" value={student.namaNegara} />}
+              </DataSection>
+              <DataSection>
+                  <DataField label="Alamat Jalan" value={student.alamatJalan} />
+                  <DataField label="RT / RW" value={`${student.rt || '-'} / ${student.rw || '-'}`} />
+                  <DataField label="Dusun" value={student.namaDusun} />
+                  <DataField label="Kelurahan / Desa" value={student.namaKelurahanDesa} />
+                  <DataField label="Kecamatan" value={student.kecamatan} />
+                  <DataField label="Kode Pos" value={student.kodePos} />
+                  <DataField label="Tempat Tinggal" value={student.tempatTinggal} />
+                  <DataField label="Moda Transportasi" value={student.modaTransportasi} />
+                  <DataField label="Status Anak" value={student.statusAnak} />
+                  <DataField label="Anak Ke-" value={student.anakKeberapa} />
+                  <DataField label="Punya KIP?" value={student.punyaKip} />
+              </DataSection>
+          </div>
         </div>
-        <div className="w-1/5 flex-shrink-0">
+        <div className="w-36 flex-shrink-0">
           <div className="w-32 h-40 border-2 border-gray-400 flex items-center justify-center text-gray-400 text-xs text-center mx-auto">
               Pas Foto 3x4
           </div>
+          <div className="text-center text-xs mt-2 w-32 mx-auto">
+            <p className="font-bold break-words">{student.namaLengkap}</p>
+            <p>NIS: {student.nis || '-'}</p>
+            <p>NISN: {student.nisn || '-'}</p>
+          </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-2 gap-x-8">
-        <SectionTitle>B. DATA AYAH KANDUNG</SectionTitle>
+       <div className="grid grid-cols-2 gap-x-8 mt-2">
+           <DataSection>
+               <DataField label="Jumlah Saudara Kandung" value={student.jumlahSaudaraKandung} />
+               <DataField label="Tinggi Badan (cm)" value={student.tinggiBadan} />
+               <DataField label="Lingkar Kepala (cm)" value={student.lingkarKepala} />
+               <DataField label="Hobi" value={student.hobi} />
+           </DataSection>
+           <DataSection>
+               <DataField label="Jumlah Saudara Tiri" value={student.jumlahSaudaraTiri} />
+               <DataField label="Berat Badan (kg)" value={student.beratBadan} />
+               <DataField label="Asal Sekolah (SMP/MTs)" value={student.sekolahAsal} />
+               <DataField label="Cita-cita" value={student.citaCita} />
+           </DataSection>
       </div>
+       <DataSection className="mt-2">
+          <DataField label="Berkebutuhan Khusus Siswa" value={student.berkebutuhanKhusus} />
+      </DataSection>
+
+      <SectionTitle>B. DATA AYAH KANDUNG</SectionTitle>
       <DataSection>
         <DataField label="Nama Ayah" value={student.namaAyah} />
         <DataField label="Status Ayah" value={student.statusAyah} />
@@ -150,9 +148,7 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
         <DataField label="Berkebutuhan Khusus Ayah" value={student.berkebutuhanKhususAyah} />
       </DataSection>
       
-      <div className="grid grid-cols-2 gap-x-8">
-        <SectionTitle>C. DATA IBU KANDUNG</SectionTitle>
-      </div>
+      <SectionTitle>C. DATA IBU KANDUNG</SectionTitle>
       <DataSection>
         <DataField label="Nama Ibu" value={student.namaIbu} />
         <DataField label="Status Ibu" value={student.statusIbu} />
@@ -166,9 +162,7 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
       
       {(student.namaWali && student.namaWali.trim() !== '') && (
         <>
-            <div className="grid grid-cols-2 gap-x-8">
-              <SectionTitle>D. DATA WALI</SectionTitle>
-            </div>
+            <SectionTitle>D. DATA WALI</SectionTitle>
           <DataSection>
             <DataField label="Nama Wali" value={student.namaWali} />
             <DataField label="NIK Wali" value={student.nikWali} />
@@ -180,9 +174,7 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
         </>
       )}
 
-        <div className="grid grid-cols-2 gap-x-8">
-          <SectionTitle>E. KONTAK</SectionTitle>
-        </div>
+      <SectionTitle>E. KONTAK</SectionTitle>
       <DataSection>
         <DataField label="Nomor Telepon Rumah" value={student.nomorTeleponRumah} />
         <DataField label="Nomor HP" value={student.nomorHp} />
@@ -206,3 +198,5 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
     </div>
   );
 }
+
+    
