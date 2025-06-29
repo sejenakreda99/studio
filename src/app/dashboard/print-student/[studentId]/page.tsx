@@ -59,39 +59,17 @@ export default function PrintStudentPage() {
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [authStatus, setAuthStatus] = useState<'checking' | 'authenticated' | 'unauthenticated'>('checking');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setAuthStatus('authenticated');
-      } else {
-        setAuthStatus('unauthenticated');
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+        // Pengguna terautentikasi, lanjutkan untuk mengambil data
+        if (!studentId) {
+            setIsLoading(false);
+            setError("ID Siswa tidak valid.");
+            return;
+        }
 
-  useEffect(() => {
-    if (authStatus === 'checking') {
-      return; // Do nothing while auth state is being determined
-    }
-
-    if (authStatus === 'unauthenticated') {
-      setError('Otentikasi dibutuhkan. Silakan login terlebih dahulu.');
-      setIsLoading(false);
-      return;
-    }
-    
-    if (!studentId) {
-        setIsLoading(false);
-        setError("ID Siswa tidak valid.");
-        return;
-    }
-
-    const fetchStudent = async () => {
-        setIsLoading(true);
-        setError(null);
         try {
             const studentDocRef = doc(db, 'students', studentId);
             const studentDoc = await getDoc(studentDocRef);
@@ -111,13 +89,18 @@ export default function PrintStudentPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+      } else {
+        // Status auth selesai diperiksa, dan tidak ada pengguna yang login.
+        setError('Otentikasi dibutuhkan. Silakan login terlebih dahulu.');
+        setIsLoading(false);
+      }
+    });
     
-    fetchStudent();
-  }, [studentId, authStatus]);
+    return () => unsubscribe();
+  }, [studentId]);
 
 
-  if (isLoading || authStatus === 'checking') {
+  if (isLoading) {
     return <PrintSkeleton />;
   }
 
