@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { collection, getDocs, orderBy, query, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
@@ -190,6 +190,25 @@ export default function DashboardPage() {
     }
   };
 
+  const handleDeleteStudent = async (studentId: string) => {
+    const studentRef = doc(db, 'students', studentId);
+    try {
+        await deleteDoc(studentRef);
+        setStudents(prevStudents => prevStudents.filter(student => student.id !== studentId));
+        toast({
+            title: "Data Siswa Dihapus",
+            description: "Data siswa telah berhasil dihapus dari sistem.",
+        });
+    } catch (error) {
+        console.error("Error deleting student: ", error);
+        toast({
+            variant: "destructive",
+            title: "Gagal Menghapus Data",
+            description: "Terjadi kesalahan saat menghapus data siswa.",
+        });
+    }
+  };
+
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -205,5 +224,5 @@ export default function DashboardPage() {
     );
   }
 
-  return <StudentList students={students} onUpdateStatus={handleUpdateStudentStatus} />;
+  return <StudentList students={students} onUpdateStatus={handleUpdateStudentStatus} onDeleteStudent={handleDeleteStudent} />;
 }

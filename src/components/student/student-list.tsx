@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { MoreHorizontal, UserPlus } from 'lucide-react';
 import {
   Table,
@@ -33,7 +33,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { Student } from '@/types/student';
 import {
@@ -54,26 +54,41 @@ import {
 } from '@/components/ui/tooltip';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import Link from 'next/link';
 
 interface StudentListProps {
   students: Student[];
   onUpdateStatus: (studentId: string, status: string, catatan?: string) => Promise<void>;
+  onDeleteStudent: (studentId: string) => Promise<void>;
 }
 
-export function StudentList({ students, onUpdateStatus }: StudentListProps) {
-  const [dialogState, setDialogState] = useState<{ open: boolean; studentId: string | null }>({ open: false, studentId: null });
+export function StudentList({ students, onUpdateStatus, onDeleteStudent }: StudentListProps) {
+  const router = useRouter();
+  const [residuDialog, setResiduDialog] = useState<{ open: boolean; studentId: string | null }>({ open: false, studentId: null });
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; studentId: string | null, studentName: string | null }>({ open: false, studentId: null, studentName: null });
   const [catatan, setCatatan] = useState('');
 
   const handleOpenResiduDialog = (studentId: string) => {
     const student = students.find(s => s.id === studentId);
-    setDialogState({ open: true, studentId });
+    setResiduDialog({ open: true, studentId });
     setCatatan(student?.catatanValidasi || '');
   };
   
   const handleSubmitResidu = async () => {
-    if (dialogState.studentId) {
-      await onUpdateStatus(dialogState.studentId, 'Residu', catatan);
-      setDialogState({ open: false, studentId: null });
+    if (residuDialog.studentId) {
+      await onUpdateStatus(residuDialog.studentId, 'Residu', catatan);
+      setResiduDialog({ open: false, studentId: null });
+    }
+  };
+
+  const handleOpenDeleteDialog = (studentId: string, studentName: string) => {
+    setDeleteDialog({ open: true, studentId, studentName });
+  };
+
+  const handleSubmitDelete = async () => {
+    if (deleteDialog.studentId) {
+      await onDeleteStudent(deleteDialog.studentId);
+      setDeleteDialog({ open: false, studentId: null, studentName: null });
     }
   };
 
@@ -165,8 +180,8 @@ export function StudentList({ students, onUpdateStatus }: StudentListProps) {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuLabel>Manajemen</DropdownMenuLabel>
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">Hapus</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push(`/dashboard/edit-student/${student.id}`)}>Edit</DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive focus:bg-destructive focus:text-destructive-foreground" onClick={() => handleOpenDeleteDialog(student.id, student.namaLengkap)}>Hapus</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
@@ -219,7 +234,7 @@ export function StudentList({ students, onUpdateStatus }: StudentListProps) {
         </Tabs>
       </CardContent>
     </Card>
-    <AlertDialog open={dialogState.open} onOpenChange={(open) => setDialogState({ ...dialogState, open })}>
+    <AlertDialog open={residuDialog.open} onOpenChange={(open) => setResiduDialog({ ...residuDialog, open })}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Tandai Siswa sebagai Residu</AlertDialogTitle>
@@ -240,8 +255,28 @@ export function StudentList({ students, onUpdateStatus }: StudentListProps) {
             </div>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDialogState({ open: false, studentId: null })}>Batal</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setResiduDialog({ open: false, studentId: null })}>Batal</AlertDialogCancel>
             <AlertDialogAction onClick={handleSubmitResidu}>Simpan Catatan</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+
+    <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Anda Yakin?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini tidak dapat dibatalkan. Ini akan menghapus data siswa bernama <strong>{deleteDialog.studentName}</strong> secara permanen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteDialog({ open: false, studentId: null, studentName: null })}>Batal</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleSubmitDelete}
+              className={buttonVariants({ variant: "destructive" })}
+            >
+              Hapus Permanen
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
