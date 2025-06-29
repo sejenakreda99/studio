@@ -3,7 +3,7 @@
 
 import { usePathname } from 'next/navigation';
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
-import { School, UserPlus, Power, Users, LayoutDashboard, BarChartHorizontal } from "lucide-react";
+import { School, UserPlus, Power, Users, LayoutDashboard, BarChartHorizontal, Settings } from "lucide-react";
 import Link from 'next/link';
 
 export default function DashboardLayout({
@@ -59,6 +59,14 @@ export default function DashboardLayout({
                 <Link href="/dashboard/reports">
                   <BarChartHorizontal />
                   <span>Laporan</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/dashboard/settings">
+                  <Settings />
+                  <span>Pengaturan Cetak</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
