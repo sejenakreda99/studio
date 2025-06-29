@@ -74,7 +74,7 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
           <h3 className="text-base font-bold underline uppercase">PROFIL DATA POKOK SISWA</h3>
           <p className="text-xs">Tahun Pelajaran {academicYear}</p>
       </div>
-      
+
       <SectionTitle>A. DATA PRIBADI</SectionTitle>
       <div className="flex flex-row items-start gap-x-8">
         <div className="flex-1">
@@ -143,6 +143,8 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
         <DataField label="Berkebutuhan Khusus Ayah" value={student.berkebutuhanKhususAyah} />
       </DataSection>
       
+      <div className="page-break-before" />
+
       <SectionTitle>C. DATA IBU KANDUNG</SectionTitle>
       <DataSection>
         <DataField label="Nama Ibu" value={student.namaIbu} />
