@@ -15,10 +15,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { PrintSettings } from '@/types/settings';
 import { updatePrintSettings } from '@/lib/settings-service';
-import { uploadFile } from '@/lib/storage-service';
 
 const settingsSchema = z.object({
-  schoolLetterheadUrl: z.string().url({ message: 'Harap masukkan URL yang valid.' }).or(z.literal('')).nullable(),
+  schoolLetterheadUrl: z.string().optional().nullable(),
   signaturePlace: z.string().min(1, 'Tempat tanda tangan harus diisi.'),
   committeeHeadTitle: z.string().min(1, 'Jabatan harus diisi.'),
   committeeHeadName: z.string().min(1, 'Nama lengkap harus diisi.'),
@@ -34,7 +33,6 @@ interface PrintSettingsFormProps {
 export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<SettingsFormValues>({
@@ -48,29 +46,49 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
     },
   });
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
-    try {
-      const downloadURL = await uploadFile(file, 'letterheads');
-      form.setValue('schoolLetterheadUrl', downloadURL, { shouldValidate: true });
-      toast({
-        title: 'Upload Berhasil',
-        description: 'Gambar kop surat telah berhasil diunggah.',
-      });
-    } catch (error) {
-      console.error('Error uploading file:', error);
+    // File size check (e.g., 500KB limit) to prevent exceeding Firestore document limits
+    const MAX_FILE_SIZE = 500 * 1024; // 500 KB
+    if (file.size > MAX_FILE_SIZE) {
       toast({
         variant: 'destructive',
-        title: 'Upload Gagal',
-        description: 'Terjadi kesalahan saat mengunggah gambar. Pastikan Anda memiliki izin di Firebase Storage.',
+        title: 'Ukuran File Terlalu Besar',
+        description: 'Ukuran gambar tidak boleh melebihi 500KB. Harap optimalkan gambar Anda.',
       });
-    } finally {
-      setIsUploading(false);
+      return;
     }
+    
+    if (!['image/png', 'image/jpeg', 'image/gif'].includes(file.type)) {
+        toast({
+            variant: 'destructive',
+            title: 'Format File Tidak Didukung',
+            description: 'Harap unggah gambar dengan format PNG, JPG, atau GIF.',
+        });
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUri = reader.result as string;
+      form.setValue('schoolLetterheadUrl', dataUri, { shouldValidate: true });
+      toast({
+        title: 'Gambar Diproses',
+        description: 'Pratinjau gambar telah diperbarui. Jangan lupa klik "Simpan Pengaturan".',
+      });
+    };
+    reader.onerror = () => {
+      toast({
+        variant: 'destructive',
+        title: 'Gagal Membaca File',
+        description: 'Terjadi kesalahan saat memproses gambar yang Anda pilih.',
+      });
+    };
+    reader.readAsDataURL(file);
   };
+
 
   async function onSubmit(values: SettingsFormValues) {
     setIsLoading(true);
@@ -122,19 +140,15 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
                         type="button"
                         variant="outline"
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
+                        disabled={isLoading}
                       >
-                        {isUploading ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <Upload className="mr-2 h-4 w-4" />
-                        )}
-                        {isUploading ? 'Mengunggah...' : 'Pilih Gambar Kop Surat'}
+                        <Upload className="mr-2 h-4 w-4" />
+                        Pilih Gambar Kop Surat
                       </Button>
                     </div>
                   </FormControl>
                   <FormDescription>
-                    Unggah gambar kop surat Anda (format PNG, JPG). Biarkan kosong untuk menggunakan teks default.
+                    Unggah gambar kop surat Anda (PNG, JPG, GIF, maks 500KB). Biarkan kosong untuk menggunakan teks default.
                   </FormDescription>
                   {field.value && (
                     <div className="mt-4 rounded-md border p-4">
@@ -217,8 +231,8 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
               )}
             />
             <div className="flex justify-end">
-                <Button type="submit" disabled={isLoading || isUploading}>
-                {(isLoading || isUploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button type="submit" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Simpan Pengaturan
                 </Button>
             </div>
@@ -228,3 +242,5 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
     </Card>
   );
 }
+
+    
