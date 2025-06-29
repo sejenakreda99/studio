@@ -1,3 +1,4 @@
+
 import { LoginForm } from '@/components/auth/login-form';
 import { School } from 'lucide-react';
 
@@ -19,7 +20,7 @@ export default function LoginPage() {
       </main>
       <footer className="flex h-16 items-center justify-center border-t bg-card px-4 text-center">
         <p className="text-sm text-muted-foreground">
-          2025 &copy; Hak Cipta Dilindungi. Dibuat oleh SMAS PGRI Naringgul.
+          2025 @ hak cipta di lindungi. Created by KS.
         </p>
       </footer>
     </div>

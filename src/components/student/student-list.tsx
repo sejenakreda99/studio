@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { MoreHorizontal, UserPlus, FileDown, Upload, FileUp, Search, CalendarIcon, Trash2, CheckCircle, ChevronDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { DateRange } from "react-day-picker";
@@ -142,8 +142,9 @@ export function StudentList({
   const router = useRouter();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const searchParams = useSearchParams();
   
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState(searchParams.get('status') || 'all');
   const [residuDialog, setResiduDialog] = useState<{ open: boolean; studentId: string | null }>({ open: false, studentId: null });
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; studentId: string | null, studentName: string | null }>({ open: false, studentId: null, studentName: null });
   const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);

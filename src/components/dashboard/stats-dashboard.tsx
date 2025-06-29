@@ -9,6 +9,7 @@ import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { startOfMonth } from 'date-fns';
 import { Users, UserCheck, UserX, Users2, FileBarChart, PieChartIcon, FileCheck } from 'lucide-react';
 import { studentFormSchema } from '@/lib/schemas/student-schema';
+import Link from 'next/link';
 
 
 interface StatsDashboardProps {
@@ -101,46 +102,54 @@ export function StatsDashboard({ students }: StatsDashboardProps) {
   return (
     <div className="flex flex-col gap-6">
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Siswa</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">Jumlah seluruh siswa terdaftar</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Data Valid</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.valid}</div>
-            <p className="text-xs text-muted-foreground">Siswa dengan data terverifikasi</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Data Residu</CardTitle>
-            <UserX className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.residu}</div>
-            <p className="text-xs text-muted-foreground">Siswa dengan data perlu perbaikan</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pendaftar Bulan Ini</CardTitle>
-            <Users2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+{stats.newThisMonth}</div>
-            <p className="text-xs text-muted-foreground">Siswa yang mendaftar bulan ini</p>
-          </CardContent>
-        </Card>
+        <Link href="/dashboard/students?status=all">
+          <Card className="hover:bg-muted/50 cursor-pointer transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Siswa</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total}</div>
+              <p className="text-xs text-muted-foreground">Jumlah seluruh siswa terdaftar</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/dashboard/students?status=valid">
+          <Card className="hover:bg-muted/50 cursor-pointer transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Data Valid</CardTitle>
+              <UserCheck className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.valid}</div>
+              <p className="text-xs text-muted-foreground">Siswa dengan data terverifikasi</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/dashboard/students?status=residual">
+          <Card className="hover:bg-muted/50 cursor-pointer transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Data Residu</CardTitle>
+              <UserX className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.residu}</div>
+              <p className="text-xs text-muted-foreground">Siswa dengan data perlu perbaikan</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/dashboard/students">
+          <Card className="hover:bg-muted/50 cursor-pointer transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pendaftar Bulan Ini</CardTitle>
+              <Users2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">+{stats.newThisMonth}</div>
+              <p className="text-xs text-muted-foreground">Siswa yang mendaftar bulan ini</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">

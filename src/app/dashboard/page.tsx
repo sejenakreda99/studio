@@ -2,34 +2,17 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { AlertCircle, FileBarChart, PieChartIcon, Users, UserCheck, UserX, Users2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
-import { db, auth } from '@/lib/firebase';
+import { auth } from '@/lib/firebase';
 import type { Student } from '@/types/student';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { StatsDashboard } from '@/components/dashboard/stats-dashboard';
-
-// Re-usable getStudents function
-async function getStudents(): Promise<Student[]> {
-  try {
-    const studentsCollection = collection(db, 'students');
-    const q = query(studentsCollection, orderBy('tanggalRegistrasi', 'desc'));
-    const querySnapshot = await getDocs(q);
-
-    return querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return { id: doc.id, ...data } as Student;
-    }) as Student[];
-  } catch (error) {
-    console.error("Error fetching students: ", error);
-    throw error;
-  }
-}
+import { getStudents } from '@/lib/student-service';
 
 
 function DashboardSkeleton() {
