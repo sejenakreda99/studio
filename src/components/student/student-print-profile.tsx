@@ -10,9 +10,9 @@ const DataField = ({ label, value }: { label: string; value: any }) => {
     const displayValue = value === null || value === undefined || value === '' ? '-' : Array.isArray(value) && value.length === 0 ? '-' : Array.isArray(value) ? value.join(', ') : String(value);
     return (
         <tr>
-            <td className="py-1 align-top w-2/5 md:w-1/3 text-gray-600">{label}</td>
-            <td className="py-1 align-top w-[5%]">:</td>
-            <td className="py-1 align-top w-auto font-medium text-gray-800">{displayValue}</td>
+            <td className="py-1 align-top w-[130px] text-gray-600">{label}</td>
+            <td className="py-1 align-top w-[10px]">:</td>
+            <td className="py-1 align-top font-medium text-gray-800">{displayValue}</td>
         </tr>
     );
 };
@@ -111,11 +111,6 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
           <div className="w-32 h-40 border-2 border-gray-400 flex items-center justify-center text-gray-400 text-xs text-center mx-auto">
               Pas Foto 3x4
           </div>
-          <div className="text-center text-xs mt-2 w-32 mx-auto">
-            <p className="font-bold break-words">{student.namaLengkap}</p>
-            <p>NIS: {student.nis || '-'}</p>
-            <p>NISN: {student.nisn || '-'}</p>
-          </div>
         </div>
       </div>
        <div className="grid grid-cols-2 gap-x-8 mt-2">
@@ -198,5 +193,3 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
     </div>
   );
 }
-
-    
