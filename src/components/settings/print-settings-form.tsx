@@ -4,8 +4,9 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Loader2, Upload } from 'lucide-react';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
@@ -14,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { PrintSettings } from '@/types/settings';
 import { updatePrintSettings } from '@/lib/settings-service';
+import { uploadFile } from '@/lib/storage-service';
 
 const settingsSchema = z.object({
   schoolLetterheadUrl: z.string().url({ message: 'Harap masukkan URL yang valid.' }).or(z.literal('')).nullable(),
@@ -32,6 +34,8 @@ interface PrintSettingsFormProps {
 export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -43,6 +47,30 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
       committeeHeadId: initialData?.committeeHeadId || '',
     },
   });
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const downloadURL = await uploadFile(file, 'letterheads');
+      form.setValue('schoolLetterheadUrl', downloadURL, { shouldValidate: true });
+      toast({
+        title: 'Upload Berhasil',
+        description: 'Gambar kop surat telah berhasil diunggah.',
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Upload Gagal',
+        description: 'Terjadi kesalahan saat mengunggah gambar. Pastikan Anda memiliki izin di Firebase Storage.',
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   async function onSubmit(values: SettingsFormValues) {
     setIsLoading(true);
@@ -80,13 +108,46 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
               name="schoolLetterheadUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>URL Gambar Kop Surat</FormLabel>
+                  <FormLabel>Gambar Kop Surat</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://contoh.com/gambar-kop.png" {...field} value={field.value || ''} />
+                    <>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/png, image/jpeg, image/gif"
+                        onChange={handleFileChange}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                      >
+                        {isUploading ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Upload className="mr-2 h-4 w-4" />
+                        )}
+                        {isUploading ? 'Mengunggah...' : 'Pilih Gambar Kop Surat'}
+                      </Button>
+                    </>
                   </FormControl>
                   <FormDescription>
-                    Unggah gambar kop surat ke layanan hosting gambar (seperti Imgur) dan tempelkan URL-nya di sini. Biarkan kosong untuk menggunakan teks default.
+                    Unggah gambar kop surat Anda (format PNG, JPG). Biarkan kosong untuk menggunakan teks default.
                   </FormDescription>
+                  {field.value && (
+                    <div className="mt-4 rounded-md border p-4">
+                      <p className="mb-2 text-sm font-medium">Pratinjau Kop Surat:</p>
+                      <Image
+                        src={field.value}
+                        alt="Pratinjau Kop Surat"
+                        width={700}
+                        height={150}
+                        className="rounded-md border object-contain"
+                      />
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -156,8 +217,8 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
               )}
             />
             <div className="flex justify-end">
-                <Button type="submit" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button type="submit" disabled={isLoading || isUploading}>
+                {(isLoading || isUploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Simpan Pengaturan
                 </Button>
             </div>
