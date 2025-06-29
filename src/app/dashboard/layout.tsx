@@ -6,6 +6,7 @@ import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, S
 import { School, UserPlus, Power, Users, LayoutDashboard, BarChartHorizontal, Settings } from "lucide-react";
 import Link from 'next/link';
 import { FirebaseGate } from '@/components/firebase-gate';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function DashboardLayout({
   children,
@@ -91,6 +92,7 @@ export default function DashboardLayout({
           <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
               <SidebarTrigger className="md:hidden"/>
               <h1 className="flex-1 text-xl font-semibold">Dashboard</h1>
+              <ThemeToggle />
           </header>
           <main className="flex-1 p-4 md:p-6">{children}</main>
         </SidebarInset>
