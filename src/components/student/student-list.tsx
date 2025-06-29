@@ -3,8 +3,10 @@
 
 import { useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { MoreHorizontal, UserPlus, FileDown, Upload, FileUp, Search } from 'lucide-react';
+import { MoreHorizontal, UserPlus, FileDown, Upload, FileUp, Search, CalendarIcon } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { DateRange } from "react-day-picker";
+import { format, isAfter, isBefore, isEqual } from 'date-fns';
 
 import {
   Table,
@@ -38,7 +40,7 @@ import {
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { Student } from '@/types/student';
-import type { StudentFormValues } from '@/lib/schemas/student-schema';
+import { studentFormSchema, type StudentFormValues } from '@/lib/schemas/student-schema';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,9 +57,10 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '../ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Calendar } from '../ui/calendar';
+import { cn } from '@/lib/utils';
 
-const agamaOptions = ['Islam', 'Kristen/Protestan', 'Katholik', 'Hindu', 'Budha', 'Khonghucu', 'Kepercayaan Kepada Tuhan YME'];
-const tempatTinggalOptions = ['Bersama orang tua', 'Wali', 'Kos', 'Asrama', 'Panti Asuhan', 'Pondok Pesantren'];
 
 const excelColumns = [
     { header: 'Nama Lengkap', key: 'namaLengkap' }, { header: 'Jenis Kelamin', key: 'jenisKelamin' },
@@ -103,6 +106,22 @@ interface StudentListProps {
   onImportStudents: (newStudents: Partial<StudentFormValues>[]) => Promise<void>;
 }
 
+const totalFields = Object.keys(studentFormSchema.shape).length;
+
+const calculateCompleteness = (student: Student): number => {
+    let filledFields = 0;
+    for (const key in student) {
+        if (Object.prototype.hasOwnProperty.call(studentFormSchema.shape, key)) {
+            const value = student[key as keyof Student];
+            if (value !== null && value !== undefined && value !== '' && (!Array.isArray(value) || value.length > 0)) {
+                filledFields++;
+            }
+        }
+    }
+    return (filledFields / totalFields) * 100;
+};
+
+
 export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImportStudents }: StudentListProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -113,10 +132,9 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; studentId: string | null, studentName: string | null }>({ open: false, studentId: null, studentName: null });
   const [catatan, setCatatan] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
-    agama: 'Semua',
-    tempatTinggal: 'Semua',
-  });
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
+  const [completenessFilter, setCompletenessFilter] = useState<string>('Semua');
+
 
   const handleOpenResiduDialog = (studentId: string) => {
     const student = students.find(s => s.id === studentId);
@@ -148,17 +166,27 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
         student.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.nisn?.includes(searchTerm);
       
-      const agamaMatch = filters.agama === 'Semua' || student.agama === filters.agama;
-      const tempatTinggalMatch = filters.tempatTinggal === 'Semua' || student.tempatTinggal === filters.tempatTinggal;
-
       const statusMatch = activeTab === 'all' ||
         (activeTab === 'unverified' && (student.statusValidasi === 'Belum Diverifikasi' || !student.statusValidasi)) ||
         (activeTab === 'valid' && student.statusValidasi === 'Valid') ||
         (activeTab === 'residual' && student.statusValidasi === 'Residu');
+        
+      const registrationDate = student.tanggalRegistrasi ? new Date(student.tanggalRegistrasi) : null;
+      const dateMatch = !date || !date.from || (
+          registrationDate &&
+          (isEqual(registrationDate, date.from) || isAfter(registrationDate, date.from)) &&
+          (!date.to || (isEqual(registrationDate, date.to) || isBefore(registrationDate, date.to)))
+      );
+      
+      const completeness = calculateCompleteness(student);
+      const completenessMatch = completenessFilter === 'Semua' ||
+        (completenessFilter === 'lengkap' && completeness > 80) ||
+        (completenessFilter === 'cukup' && completeness >= 50 && completeness <= 80) ||
+        (completenessFilter === 'kurang' && completeness < 50);
 
-      return searchMatch && agamaMatch && tempatTinggalMatch && statusMatch;
+      return searchMatch && statusMatch && dateMatch && completenessMatch;
     });
-  }, [students, searchTerm, filters, activeTab]);
+  }, [students, searchTerm, activeTab, date, completenessFilter]);
   
   const studentsByStatus = useMemo(() => ({
     all: students,
@@ -168,25 +196,19 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
   }), [students]);
 
   const handleExportToExcel = () => {
-    if (students.length === 0) {
+    const studentsToExport = filteredStudents;
+    if (studentsToExport.length === 0) {
       toast({
         variant: "destructive",
         title: "Tidak Ada Data",
-        description: "Tidak ada data siswa untuk diunduh.",
+        description: "Tidak ada data siswa untuk diunduh sesuai filter yang dipilih.",
       });
       return;
     }
     
-    const exportColumns = [
-      { category: 'Data Pribadi', header: 'Tanggal Registrasi', key: 'tanggalRegistrasi' },
-      { category: 'Data Pribadi', header: 'Status Validasi', key: 'statusValidasi' },
-      { category: 'Data Pribadi', header: 'Catatan Validasi', key: 'catatanValidasi' },
-      ...excelColumns.map(c => ({ category: 'Data', ...c })) // Simplified category for now
-    ];
-    
-    // A simplified export logic for brevity, the complex one is still available if needed.
-    const dataToExport = students.map(student => {
-        const row: Record<string, any> = {};
+    const dataToExport = studentsToExport.map((student, index) => {
+        const row: Record<string, any> = { 'No. Urut': index + 1 };
+        
         excelColumns.forEach(col => {
             let value = student[col.key as keyof Student];
              if (Array.isArray(value)) {
@@ -194,10 +216,17 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
             }
             row[col.header] = value ?? '';
         });
+        
+        row['Tanggal Registrasi'] = student.tanggalRegistrasi;
+        row['Status Validasi'] = student.statusValidasi;
+        row['Catatan Validasi'] = student.catatanValidasi;
+        
         return row;
     });
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    worksheet['!autofilter'] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(worksheet['!ref']!)) };
+    
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Siswa");
     XLSX.writeFile(workbook, "Data_Siswa.xlsx");
@@ -269,6 +298,7 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>No. Urut</TableHead>
             <TableHead>Nama Lengkap</TableHead>
             <TableHead className="hidden md:table-cell">NISN</TableHead>
             <TableHead className="hidden sm:table-cell">Jenis Kelamin</TableHead>
@@ -281,8 +311,9 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
           </TableRow>
         </TableHeader>
         <TableBody>
-          {studentList.map((student) => (
+          {studentList.map((student, index) => (
             <TableRow key={student.id}>
+              <TableCell>{index + 1}</TableCell>
               <TableCell className="font-medium">{student.namaLengkap}</TableCell>
               <TableCell className="hidden md:table-cell">{student.nisn || '-'}</TableCell>
               <TableCell className="hidden sm:table-cell">
@@ -385,23 +416,53 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-            <div className="flex gap-4">
-                <Select value={filters.agama} onValueChange={(value) => setFilters(prev => ({...prev, agama: value}))}>
-                    <SelectTrigger className="w-full md:w-[180px]">
-                        <SelectValue placeholder="Filter Agama" />
+            <div className="flex gap-4 flex-col sm:flex-row">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="date"
+                      variant={"outline"}
+                      className={cn(
+                        "w-full sm:w-[260px] justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date?.from ? (
+                        date.to ? (
+                          <>
+                            {format(date.from, "LLL dd, y")} -{" "}
+                            {format(date.to, "LLL dd, y")}
+                          </>
+                        ) : (
+                          format(date.from, "LLL dd, y")
+                        )
+                      ) : (
+                        <span>Pilih tanggal registrasi</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <Calendar
+                      initialFocus
+                      mode="range"
+                      defaultMonth={date?.from}
+                      selected={date}
+                      onSelect={setDate}
+                      numberOfMonths={2}
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                 <Select value={completenessFilter} onValueChange={setCompletenessFilter}>
+                    <SelectTrigger className="w-full sm:w-[220px]">
+                        <SelectValue placeholder="Filter Kelengkapan Data" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="Semua">Semua Agama</SelectItem>
-                        {agamaOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-                 <Select value={filters.tempatTinggal} onValueChange={(value) => setFilters(prev => ({...prev, tempatTinggal: value}))}>
-                    <SelectTrigger className="w-full md:w-[200px]">
-                        <SelectValue placeholder="Filter Tempat Tinggal" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Semua">Semua Tempat Tinggal</SelectItem>
-                        {tempatTinggalOptions.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                        <SelectItem value="Semua">Semua Kelengkapan</SelectItem>
+                        <SelectItem value="lengkap">Lengkap (&gt;80%)</SelectItem>
+                        <SelectItem value="cukup">Cukup Lengkap (50-80%)</SelectItem>
+                        <SelectItem value="kurang">Kurang Lengkap (&lt;50%)</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -470,3 +531,4 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
     </>
   );
 }
+
