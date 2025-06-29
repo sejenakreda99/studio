@@ -100,97 +100,141 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent }: Stude
       return;
     }
 
-    const dataForExport = students.map(student => {
-      const kandung = parseInt(student.jumlahSaudaraKandung || '0', 10);
-      const tiri = parseInt(student.jumlahSaudaraTiri || '0', 10);
-      const totalSaudara = (isNaN(kandung) ? 0 : kandung) + (isNaN(tiri) ? 0 : tiri);
-  
-      return {
-        'Data Pribadi - Tanggal Registrasi': student.tanggalRegistrasi,
-        'Data Pribadi - Status Validasi': student.statusValidasi,
-        'Data Pribadi - Catatan Validasi': student.catatanValidasi,
-        'Data Pribadi - Nama Lengkap': student.namaLengkap,
-        'Data Pribadi - Jenis Kelamin': student.jenisKelamin,
-        'Data Pribadi - NISN': student.nisn,
-        'Data Pribadi - NIS': student.nis,
-        'Data Pribadi - Status Yatim/Piatu': student.statusAnak,
-        'Data Pribadi - NIK': student.nik,
-        'Data Pribadi - No. Kartu Keluarga': student.noKk,
-        'Data Pribadi - No. Registrasi Akta Lahir': student.noRegistrasiAktaLahir,
-        'Data Pribadi - Tempat Lahir': student.tempatLahir,
-        'Data Pribadi - Tanggal Lahir': student.tanggalLahir,
-        'Data Pribadi - Agama & Kepercayaan': student.agama,
-        'Data Pribadi - Kewarganegaraan': student.kewarganegaraan,
-        'Data Pribadi - Nama Negara': student.namaNegara,
-        'Data Pribadi - Alamat Jalan': student.alamatJalan,
-        'Data Pribadi - RT': student.rt,
-        'Data Pribadi - RW': student.rw,
-        'Data Pribadi - Nama Dusun': student.namaDusun,
-        'Data Pribadi - Nama Kelurahan/Desa': student.namaKelurahanDesa,
-        'Data Pribadi - Kecamatan': student.kecamatan,
-        'Data Pribadi - Kode Pos': student.kodePos,
-        'Data Pribadi - Tempat Tinggal': student.tempatTinggal,
-        'Data Pribadi - Moda Transportasi': student.modaTransportasi,
-        'Data Pribadi - Anak Ke-berapa': student.anakKeberapa,
-        'Data Pribadi - Punya KIP?': student.punyaKip,
-        'Data Pribadi - Asal Sekolah SMP/MTs': student.sekolahAsal,
-        'Data Pribadi - Tinggi Badan (cm)': student.tinggiBadan,
-        'Data Pribadi - Berat Badan (kg)': student.beratBadan,
-        'Data Pribadi - Lingkar Kepala (cm)': student.lingkarKepala,
-        'Data Pribadi - Jumlah Saudara Kandung': student.jumlahSaudaraKandung,
-        'Data Pribadi - Jumlah Saudara Tiri': student.jumlahSaudaraTiri,
-        'Data Pribadi - Total Saudara': totalSaudara,
-        'Data Pribadi - Hobi': student.hobi,
-        'Data Pribadi - Cita-cita': student.citaCita,
-        'Data Pribadi - Berkebutuhan Khusus Siswa': student.berkebutuhanKhusus?.join(', '),
-        
-        'Data Ayah - Nama Ayah Kandung': student.namaAyah,
-        'Data Ayah - Status Ayah': student.statusAyah,
-        'Data Ayah - NIK Ayah': student.nikAyah,
-        'Data Ayah - Tahun Lahir Ayah': student.tahunLahirAyah,
-        'Data Ayah - Pendidikan Terakhir Ayah': student.pendidikanAyah,
-        'Data Ayah - Pekerjaan Ayah': student.pekerjaanAyah,
-        'Data Ayah - Penghasilan Bulanan Ayah': student.penghasilanAyah,
-        'Data Ayah - Berkebutuhan Khusus Ayah': student.berkebutuhanKhususAyah?.join(', '),
+    const columns = [
+      { category: 'Data Pribadi', header: 'Tanggal Registrasi', key: 'tanggalRegistrasi' },
+      { category: 'Data Pribadi', header: 'Status Validasi', key: 'statusValidasi' },
+      { category: 'Data Pribadi', header: 'Catatan Validasi', key: 'catatanValidasi' },
+      { category: 'Data Pribadi', header: 'Nama Lengkap', key: 'namaLengkap' },
+      { category: 'Data Pribadi', header: 'Jenis Kelamin', key: 'jenisKelamin' },
+      { category: 'Data Pribadi', header: 'NISN', key: 'nisn' },
+      { category: 'Data Pribadi', header: 'NIS', key: 'nis' },
+      { category: 'Data Pribadi', header: 'Status Yatim/Piatu', key: 'statusAnak' },
+      { category: 'Data Pribadi', header: 'NIK', key: 'nik' },
+      { category: 'Data Pribadi', header: 'No. Kartu Keluarga', key: 'noKk' },
+      { category: 'Data Pribadi', header: 'No. Registrasi Akta Lahir', key: 'noRegistrasiAktaLahir' },
+      { category: 'Data Pribadi', header: 'Tempat Lahir', key: 'tempatLahir' },
+      { category: 'Data Pribadi', header: 'Tanggal Lahir', key: 'tanggalLahir' },
+      { category: 'Data Pribadi', header: 'Agama & Kepercayaan', key: 'agama' },
+      { category: 'Data Pribadi', header: 'Kewarganegaraan', key: 'kewarganegaraan' },
+      { category: 'Data Pribadi', header: 'Nama Negara', key: 'namaNegara' },
+      { category: 'Data Pribadi', header: 'Alamat Jalan', key: 'alamatJalan' },
+      { category: 'Data Pribadi', header: 'RT', key: 'rt' },
+      { category: 'Data Pribadi', header: 'RW', key: 'rw' },
+      { category: 'Data Pribadi', header: 'Nama Dusun', key: 'namaDusun' },
+      { category: 'Data Pribadi', header: 'Nama Kelurahan/Desa', key: 'namaKelurahanDesa' },
+      { category: 'Data Pribadi', header: 'Kecamatan', key: 'kecamatan' },
+      { category: 'Data Pribadi', header: 'Kode Pos', key: 'kodePos' },
+      { category: 'Data Pribadi', header: 'Tempat Tinggal', key: 'tempatTinggal' },
+      { category: 'Data Pribadi', header: 'Moda Transportasi', key: 'modaTransportasi' },
+      { category: 'Data Pribadi', header: 'Anak Ke-berapa', key: 'anakKeberapa' },
+      { category: 'Data Pribadi', header: 'Punya KIP?', key: 'punyaKip' },
+      { category: 'Data Pribadi', header: 'Asal Sekolah SMP/MTs', key: 'sekolahAsal' },
+      { category: 'Data Pribadi', header: 'Tinggi Badan (cm)', key: 'tinggiBadan' },
+      { category: 'Data Pribadi', header: 'Berat Badan (kg)', key: 'beratBadan' },
+      { category: 'Data Pribadi', header: 'Lingkar Kepala (cm)', key: 'lingkarKepala' },
+      { category: 'Data Pribadi', header: 'Jumlah Saudara Kandung', key: 'jumlahSaudaraKandung' },
+      { category: 'Data Pribadi', header: 'Jumlah Saudara Tiri', key: 'jumlahSaudaraTiri' },
+      { category: 'Data Pribadi', header: 'Total Saudara', key: 'totalSaudara' },
+      { category: 'Data Pribadi', header: 'Hobi', key: 'hobi' },
+      { category: 'Data Pribadi', header: 'Cita-cita', key: 'citaCita' },
+      { category: 'Data Pribadi', header: 'Berkebutuhan Khusus Siswa', key: 'berkebutuhanKhusus' },
+      { category: 'Data Ayah', header: 'Nama Ayah Kandung', key: 'namaAyah' },
+      { category: 'Data Ayah', header: 'Status Ayah', key: 'statusAyah' },
+      { category: 'Data Ayah', header: 'NIK Ayah', key: 'nikAyah' },
+      { category: 'Data Ayah', header: 'Tahun Lahir Ayah', key: 'tahunLahirAyah' },
+      { category: 'Data Ayah', header: 'Pendidikan Terakhir Ayah', key: 'pendidikanAyah' },
+      { category: 'Data Ayah', header: 'Pekerjaan Ayah', key: 'pekerjaanAyah' },
+      { category: 'Data Ayah', header: 'Penghasilan Bulanan Ayah', key: 'penghasilanAyah' },
+      { category: 'Data Ayah', header: 'Berkebutuhan Khusus Ayah', key: 'berkebutuhanKhususAyah' },
+      { category: 'Data Ibu', header: 'Nama Ibu Kandung', key: 'namaIbu' },
+      { category: 'Data Ibu', header: 'Status Ibu', key: 'statusIbu' },
+      { category: 'Data Ibu', header: 'NIK Ibu', key: 'nikIbu' },
+      { category: 'Data Ibu', header: 'Tahun Lahir Ibu', key: 'tahunLahirIbu' },
+      { category: 'Data Ibu', header: 'Pendidikan Terakhir Ibu', key: 'pendidikanIbu' },
+      { category: 'Data Ibu', header: 'Pekerjaan Ibu', key: 'pekerjaanIbu' },
+      { category: 'Data Ibu', header: 'Penghasilan Bulanan Ibu', key: 'penghasilanIbu' },
+      { category: 'Data Ibu', header: 'Berkebutuhan Khusus Ibu', key: 'berkebutuhanKhususIbu' },
+      { category: 'Data Wali', header: 'Nama Wali', key: 'namaWali' },
+      { category: 'Data Wali', header: 'NIK Wali', key: 'nikWali' },
+      { category: 'Data Wali', header: 'Tahun Lahir Wali', key: 'tahunLahirWali' },
+      { category: 'Data Wali', header: 'Pendidikan Terakhir Wali', key: 'pendidikanWali' },
+      { category: 'Data Wali', header: 'Pekerjaan Wali', key: 'pekerjaanWali' },
+      { category: 'Data Wali', header: 'Penghasilan Bulanan Wali', key: 'penghasilanWali' },
+      { category: 'Kontak', header: 'Nomor Telepon Rumah', key: 'nomorTeleponRumah' },
+      { category: 'Kontak', header: 'Nomor HP', key: 'nomorHp' },
+      { category: 'Kontak', header: 'Email', key: 'email' },
+    ];
 
-        'Data Ibu - Nama Ibu Kandung': student.namaIbu,
-        'Data Ibu - Status Ibu': student.statusIbu,
-        'Data Ibu - NIK Ibu': student.nikIbu,
-        'Data Ibu - Tahun Lahir Ibu': student.tahunLahirIbu,
-        'Data Ibu - Pendidikan Terakhir Ibu': student.pendidikanIbu,
-        'Data Ibu - Pekerjaan Ibu': student.pekerjaanIbu,
-        'Data Ibu - Penghasilan Bulanan Ibu': student.penghasilanIbu,
-        'Data Ibu - Berkebutuhan Khusus Ibu': student.berkebutuhanKhususIbu?.join(', '),
+    const excelData = [];
+    const mainTitleRow = ['REKAPITULASI DATA SISWA'];
+    const categoryRow: (string | null)[] = [];
+    const fieldHeaderRow = columns.map(c => c.header);
+    const categoryMerges = [];
 
-        'Data Wali - Nama Wali': student.namaWali,
-        'Data Wali - NIK Wali': student.nikWali,
-        'Data Wali - Tahun Lahir Wali': student.tahunLahirWali,
-        'Data Wali - Pendidikan Terakhir Wali': student.pendidikanWali,
-        'Data Wali - Pekerjaan Wali': student.pekerjaanWali,
-        'Data Wali - Penghasilan Bulanan Wali': student.penghasilanWali,
-        
-        'Kontak - Nomor Telepon Rumah': student.nomorTeleponRumah,
-        'Kontak - Nomor HP': student.nomorHp,
-        'Kontak - Email': student.email,
-      };
+    let currentCategory = '';
+    let mergeStartCol = -1;
+    columns.forEach((col, index) => {
+      if (col.category !== currentCategory) {
+        if (currentCategory !== '') {
+          categoryMerges.push({ s: { r: 2, c: mergeStartCol }, e: { r: 2, c: index - 1 } });
+        }
+        currentCategory = col.category;
+        mergeStartCol = index;
+        categoryRow[index] = col.category;
+      } else {
+        categoryRow[index] = null;
+      }
+    });
+    categoryMerges.push({ s: { r: 2, c: mergeStartCol }, e: { r: 2, c: columns.length - 1 } });
+
+    excelData.push(mainTitleRow);
+    excelData.push([]);
+    excelData.push(categoryRow);
+    excelData.push(fieldHeaderRow);
+
+    students.forEach(student => {
+      const studentRow = columns.map(col => {
+        let value;
+        if (col.key === 'totalSaudara') {
+          const kandung = parseInt(student.jumlahSaudaraKandung || '0', 10);
+          const tiri = parseInt(student.jumlahSaudaraTiri || '0', 10);
+          value = (isNaN(kandung) ? 0 : kandung) + (isNaN(tiri) ? 0 : tiri);
+        } else {
+          value = student[col.key as keyof Student];
+        }
+
+        if (Array.isArray(value)) {
+          return value.join(', ');
+        }
+        return value ?? '';
+      });
+      excelData.push(studentRow);
     });
 
-    const worksheet = XLSX.utils.json_to_sheet(dataForExport);
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
+
+    worksheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: columns.length - 1 } },
+      ...categoryMerges
+    ];
+
+    const colWidths = fieldHeaderRow.map((header, colIndex) => {
+      let maxLength = header.length;
+      for (let i = 4; i < excelData.length; i++) {
+        const cell = excelData[i][colIndex];
+        if (cell != null) {
+          const cellLength = cell.toString().length;
+          if (cellLength > maxLength) {
+            maxLength = cellLength;
+          }
+        }
+      }
+      return { wch: maxLength + 2 };
+    });
+    worksheet['!cols'] = colWidths;
+
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Siswa");
-
-    // Optional: Auto-size columns for better readability
-    const objectMaxLength = [];
-    for (const key in dataForExport[0]) {
-      objectMaxLength.push(
-        Math.max(
-          ...dataForExport.map(item => (item[key as keyof typeof item] ? item[key as keyof typeof item]!.toString().length : 0)),
-          key.length
-        )
-      );
-    }
-    worksheet["!cols"] = objectMaxLength.map(w => ({ width: w + 2 }));
-
     XLSX.writeFile(workbook, "Data_Siswa.xlsx");
   };
 
@@ -380,3 +424,5 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent }: Stude
     </>
   );
 }
+
+    
