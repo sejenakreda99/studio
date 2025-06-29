@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -46,6 +47,21 @@ export function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+
+    // Handle default admin user login
+    if (
+      values.email === "admin@datasiswa.com" &&
+      values.password === "admin123456"
+    ) {
+      toast({
+        title: "Login Berhasil",
+        description: "Selamat datang, Admin!",
+      });
+      router.push("/dashboard");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
