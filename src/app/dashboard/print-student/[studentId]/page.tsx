@@ -5,8 +5,9 @@ import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'next/navigation';
 import { Printer, AlertCircle } from 'lucide-react';
+import { onAuthStateChanged } from 'firebase/auth';
 
-import { db } from '@/lib/firebase';
+import { db, auth } from '@/lib/firebase';
 import type { Student } from '@/types/student';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -60,30 +61,47 @@ export default function PrintStudentPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!studentId) return;
-
-    const fetchStudent = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const studentDocRef = doc(db, 'students', studentId);
-        const studentDoc = await getDoc(studentDocRef);
-
-        if (studentDoc.exists()) {
-          setStudent({ id: studentDoc.id, ...studentDoc.data() } as Student);
-        } else {
-          setError('Siswa tidak ditemukan.');
-        }
-      } catch (err) {
-        console.error('Error fetching student data:', err);
-        setError('Gagal memuat data siswa.');
-      } finally {
+    if (!studentId) {
         setIsLoading(false);
-      }
-    };
+        setError("ID Siswa tidak valid.");
+        return;
+    }
 
-    fetchStudent();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const fetchStudent = async () => {
+                setIsLoading(true);
+                setError(null);
+                try {
+                    const studentDocRef = doc(db, 'students', studentId);
+                    const studentDoc = await getDoc(studentDocRef);
+
+                    if (studentDoc.exists()) {
+                        setStudent({ id: studentDoc.id, ...studentDoc.data() } as Student);
+                    } else {
+                        setError('Siswa tidak ditemukan.');
+                    }
+                } catch (err: any) {
+                    console.error('Error fetching student data:', err);
+                    if (err.code === 'permission-denied') {
+                        setError('Anda tidak memiliki izin untuk melihat data ini. Pastikan Anda sudah login.');
+                    } else {
+                        setError('Gagal memuat data siswa.');
+                    }
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            fetchStudent();
+        } else {
+            setError('Otentikasi dibutuhkan. Silakan login terlebih dahulu.');
+            setIsLoading(false);
+        }
+    });
+
+    return () => unsubscribe();
   }, [studentId]);
+
 
   if (isLoading) {
     return <PrintSkeleton />;
