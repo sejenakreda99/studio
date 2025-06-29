@@ -149,7 +149,7 @@ export function AddStudentForm() {
         title: 'Sukses',
         description: 'Data siswa baru berhasil disimpan.',
       });
-      router.push('/dashboard');
+      router.push('/dashboard/students');
     } catch (error) {
       console.error('Error adding document: ', error);
       toast({

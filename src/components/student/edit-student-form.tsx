@@ -105,7 +105,7 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
         title: 'Sukses',
         description: 'Data siswa berhasil diperbarui.',
       });
-      router.push('/dashboard');
+      router.push('/dashboard/students');
       router.refresh(); 
     } catch (error) {
       console.error('Error updating document: ', error);

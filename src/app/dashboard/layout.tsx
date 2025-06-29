@@ -1,5 +1,5 @@
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
-import { School, UserPlus, Power, Users } from "lucide-react";
+import { School, UserPlus, Power, Users, LayoutDashboard } from "lucide-react";
 import Link from 'next/link';
 
 export default function DashboardLayout({
@@ -20,9 +20,17 @@ export default function DashboardLayout({
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            <SidebarMenuItem>
+             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link href="/dashboard">
+                  <LayoutDashboard />
+                  <span>Statistik</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/dashboard/students">
                   <Users />
                   <span>Daftar Siswa</span>
                 </Link>
