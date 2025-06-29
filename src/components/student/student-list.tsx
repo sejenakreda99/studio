@@ -63,10 +63,11 @@ import { cn } from '@/lib/utils';
 
 
 const excelColumns = [
+    // Data Pribadi (33)
     { header: 'Nama Lengkap', key: 'namaLengkap' }, { header: 'Jenis Kelamin', key: 'jenisKelamin' },
     { header: 'NISN', key: 'nisn' }, { header: 'NIS', key: 'nis' },
     { header: 'NIK', key: 'nik' }, { header: 'No. Kartu Keluarga', key: 'noKk' },
-    { header: 'Tempat Lahir', key: 'tempatLahir' }, { header: 'Tanggal Lahir (YYYY-MM-DD)', key: 'tanggalLahir' },
+    { header: 'Tempat Lahir', key: 'tempatLahir' }, { header: 'Tanggal Lahir (DD-MM-YYYY)', key: 'tanggalLahir' },
     { header: 'No. Registrasi Akta Lahir', key: 'noRegistrasiAktaLahir' }, { header: 'Agama & Kepercayaan', key: 'agama' },
     { header: 'Kewarganegaraan', key: 'kewarganegaraan' }, { header: 'Nama Negara', key: 'namaNegara' },
     { header: 'Berkebutuhan Khusus Siswa', key: 'berkebutuhanKhusus' }, { header: 'Alamat Jalan', key: 'alamatJalan' },
@@ -79,19 +80,24 @@ const excelColumns = [
     { header: 'Tinggi Badan (cm)', key: 'tinggiBadan' }, { header: 'Berat Badan (kg)', key: 'beratBadan' },
     { header: 'Lingkar Kepala (cm)', key: 'lingkarKepala' }, { header: 'Jumlah Saudara Kandung', key: 'jumlahSaudaraKandung' },
     { header: 'Jumlah Saudara Tiri', key: 'jumlahSaudaraTiri' }, { header: 'Hobi', key: 'hobi' },
-    { header: 'Cita-cita', key: 'citaCita' }, { header: 'Nama Ayah Kandung', key: 'namaAyah' },
-    { header: 'Status Ayah', key: 'statusAyah' }, { header: 'NIK Ayah', key: 'nikAyah' },
-    { header: 'Tahun Lahir Ayah', key: 'tahunLahirAyah' }, { header: 'Pendidikan Terakhir Ayah', key: 'pendidikanAyah' },
-    { header: 'Pekerjaan Ayah', key: 'pekerjaanAyah' }, { header: 'Penghasilan Bulanan Ayah', key: 'penghasilanAyah' },
-    { header: 'Berkebutuhan Khusus Ayah', key: 'berkebutuhanKhususAyah' }, { header: 'Nama Ibu Kandung', key: 'namaIbu' },
-    { header: 'Status Ibu', key: 'statusIbu' }, { header: 'NIK Ibu', key: 'nikIbu' },
-    { header: 'Tahun Lahir Ibu', key: 'tahunLahirIbu' }, { header: 'Pendidikan Terakhir Ibu', key: 'pendidikanIbu' },
-    { header: 'Pekerjaan Ibu', key: 'pekerjaanIbu' }, { header: 'Penghasilan Bulanan Ibu', key: 'penghasilanIbu' },
-    { header: 'Berkebutuhan Khusus Ibu', key: 'berkebutuhanKhususIbu' }, { header: 'Nama Wali', key: 'namaWali' },
-    { header: 'NIK Wali', key: 'nikWali' }, { header: 'Tahun Lahir Wali', key: 'tahunLahirWali' },
-    { header: 'Pendidikan Terakhir Wali', key: 'pendidikanWali' }, { header: 'Pekerjaan Wali', key: 'pekerjaanWali' },
-    { header: 'Penghasilan Bulanan Wali', key: 'penghasilanWali' }, { header: 'Nomor Telepon Rumah', key: 'nomorTeleponRumah' },
-    { header: 'Nomor HP', key: 'nomorHp' }, { header: 'Email', key: 'email' },
+    { header: 'Cita-cita', key: 'citaCita' },
+    // Data Ayah (8)
+    { header: 'Nama Ayah Kandung', key: 'namaAyah' }, { header: 'Status Ayah', key: 'statusAyah' },
+    { header: 'NIK Ayah', key: 'nikAyah' }, { header: 'Tahun Lahir Ayah', key: 'tahunLahirAyah' },
+    { header: 'Pendidikan Terakhir Ayah', key: 'pendidikanAyah' }, { header: 'Pekerjaan Ayah', key: 'pekerjaanAyah' },
+    { header: 'Penghasilan Bulanan Ayah', key: 'penghasilanAyah' }, { header: 'Berkebutuhan Khusus Ayah', key: 'berkebutuhanKhususAyah' },
+    // Data Ibu (8)
+    { header: 'Nama Ibu Kandung', key: 'namaIbu' }, { header: 'Status Ibu', key: 'statusIbu' },
+    { header: 'NIK Ibu', key: 'nikIbu' }, { header: 'Tahun Lahir Ibu', key: 'tahunLahirIbu' },
+    { header: 'Pendidikan Terakhir Ibu', key: 'pendidikanIbu' }, { header: 'Pekerjaan Ibu', key: 'pekerjaanIbu' },
+    { header: 'Penghasilan Bulanan Ibu', key: 'penghasilanIbu' }, { header: 'Berkebutuhan Khusus Ibu', key: 'berkebutuhanKhususIbu' },
+    // Data Wali (6)
+    { header: 'Nama Wali', key: 'namaWali' }, { header: 'NIK Wali', key: 'nikWali' },
+    { header: 'Tahun Lahir Wali', key: 'tahunLahirWali' }, { header: 'Pendidikan Terakhir Wali', key: 'pendidikanWali' },
+    { header: 'Pekerjaan Wali', key: 'pekerjaanWali' }, { header: 'Penghasilan Bulanan Wali', key: 'penghasilanWali' },
+    // Kontak (3)
+    { header: 'Nomor Telepon Rumah', key: 'nomorTeleponRumah' }, { header: 'Nomor HP', key: 'nomorHp' },
+    { header: 'Email', key: 'email' },
 ];
 
 const excelHeadersToKeys = excelColumns.reduce((acc, col) => {
@@ -205,35 +211,103 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
       });
       return;
     }
+  
+    // Define group headers and their column spans
+    const groupHeadersConfig = [
+        { title: ' ', span: 1 }, // For 'No. Urut'
+        { title: 'Data Pribadi', span: 33 },
+        { title: 'Data Ayah', span: 8 },
+        { title: 'Data Ibu', span: 8 },
+        { title: 'Data Wali', span: 6 },
+        { title: 'Kontak', span: 3 },
+        { title: 'Status Pendaftaran', span: 3 },
+    ];
+  
+    // Main title row
+    const mainHeaderRow = ['REKAPITULASI DATA SISWA'];
+  
+    // Group header row
+    const groupHeaderRow: string[] = [];
+    const merges = [];
+    let currentCol = 0;
+    for (const group of groupHeadersConfig) {
+      groupHeaderRow.push(group.title);
+      if (group.span > 1) {
+        merges.push({ s: { r: 2, c: currentCol }, e: { r: 2, c: currentCol + group.span - 1 } });
+        // Add empty cells for the merge
+        for (let i = 1; i < group.span; i++) {
+          groupHeaderRow.push('');
+        }
+      }
+      currentCol += group.span;
+    }
+     // Main header merge
+    merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: currentCol - 1 } });
+  
+  
+    // Individual column headers
+    const columnHeaderRow = [
+      'No. Urut',
+      ...excelColumns.map(c => c.header),
+      'Tanggal Registrasi (DD-MM-YYYY)',
+      'Status Validasi',
+      'Catatan Validasi'
+    ];
+  
+    // Prepare all header rows for the worksheet
+    const worksheetData = [
+      mainHeaderRow,
+      [], // Empty row for spacing
+      groupHeaderRow,
+      columnHeaderRow
+    ];
     
+    // Prepare student data rows
     const dataToExport = studentsToExport.map((student, index) => {
-        const row: Record<string, any> = { 'No. Urut': index + 1 };
-        
-        excelColumns.forEach(col => {
-            let value = student[col.key as keyof Student];
-             if (Array.isArray(value)) {
-                value = value.join(', ');
-            }
-            row[col.header] = value ?? '';
-        });
-        
-        row['Tanggal Registrasi'] = student.tanggalRegistrasi;
-        row['Status Validasi'] = student.statusValidasi;
-        row['Catatan Validasi'] = student.catatanValidasi;
-        
-        return row;
+      const row: any[] = [index + 1]; // No. Urut
+      excelColumns.forEach(col => {
+        let value = student[col.key as keyof Student];
+        if (Array.isArray(value)) {
+          value = value.join(', ');
+        }
+        row.push(value ?? '');
+      });
+      row.push(
+          student.tanggalRegistrasi,
+          student.statusValidasi ?? '',
+          student.catatanValidasi ?? ''
+      );
+      return row;
     });
-
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    worksheet['!autofilter'] = { ref: XLSX.utils.encode_range(XLSX.utils.decode_range(worksheet['!ref']!)) };
+  
+    // Create worksheet from headers
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
     
+    // Add student data starting from row 5 (index 4)
+    XLSX.utils.sheet_add_aoa(worksheet, dataToExport, { origin: 'A5' });
+  
+    // Apply merges
+    worksheet['!merges'] = merges;
+    
+    // Auto-filter on the column header row (row 4, index 3)
+    const filterRange = `A4:${XLSX.utils.encode_col(columnHeaderRow.length - 1)}4`;
+    worksheet['!autofilter'] = { ref: filterRange };
+  
+    // Auto-fit column widths
+    const allDataForWidthCalc = [...worksheetData.slice(2), ...dataToExport]; // Use group, column, and data rows for width calculation
+    const colWidths = columnHeaderRow.map((_, i) => ({
+      wch: Math.max(...allDataForWidthCalc.map(row => (row[i] ? row[i].toString().length : 0))) + 2,
+    }));
+    worksheet['!cols'] = colWidths;
+    
+    // Create and download workbook
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data Siswa");
-    XLSX.writeFile(workbook, "Data_Siswa.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Siswa');
+    XLSX.writeFile(workbook, 'Data_Siswa.xlsx');
   };
 
   const handleDownloadTemplate = () => {
-    const headers = excelColumns.map(c => c.header);
+    const headers = excelColumns.map(c => c.header.replace(' (DD-MM-YYYY)', ' (YYYY-MM-DD)'));
     const worksheet = XLSX.utils.aoa_to_sheet([headers]);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
@@ -256,8 +330,9 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
             const newStudents: Partial<StudentFormValues>[] = json.map(row => {
                 const student: Partial<StudentFormValues> = {};
                 for (const header in row) {
-                    if (excelHeadersToKeys[header]) {
-                        const key = excelHeadersToKeys[header] as keyof StudentFormValues;
+                     const cleanHeader = header.replace(' (YYYY-MM-DD)', '');
+                    if (excelHeadersToKeys[cleanHeader]) {
+                        const key = excelHeadersToKeys[cleanHeader] as keyof StudentFormValues;
                         (student as any)[key] = row[header];
                     }
                 }
@@ -531,4 +606,3 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
     </>
   );
 }
-
