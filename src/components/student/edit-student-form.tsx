@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { studentFormSchema, StudentFormValues } from '@/lib/schemas/student-schema';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -84,6 +84,19 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
     return (isNaN(kandung) ? 0 : kandung) + (isNaN(tiri) ? 0 : tiri);
   }, [jumlahSaudaraKandung, jumlahSaudaraTiri]);
 
+  const onInvalid = (errors: FieldErrors<StudentFormValues>) => {
+    const firstErrorKey = Object.keys(errors)[0] as keyof StudentFormValues;
+    if (firstErrorKey) {
+        const errorMessage = errors[firstErrorKey]?.message;
+        if (errorMessage) {
+            toast({
+                variant: "destructive",
+                title: "Periksa Kembali Isian Anda",
+                description: String(errorMessage),
+            });
+        }
+    }
+  };
 
   async function onSubmit(data: StudentFormValues) {
     setIsLoading(true);
@@ -159,7 +172,16 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
             </FormControl>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
+            <Calendar
+              mode="single"
+              selected={field.value}
+              onSelect={field.onChange}
+              disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+              initialFocus
+              captionLayout={name === 'tanggalLahir' ? "dropdown-buttons" : undefined}
+              fromYear={name === 'tanggalLahir' ? 1950 : undefined}
+              toYear={name === 'tanggalLahir' ? new Date().getFullYear() : undefined}
+            />
           </PopoverContent>
         </Popover>
         <FormMessage />
@@ -200,7 +222,7 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6">
         <h2 className="text-2xl font-bold">Edit Data Siswa: {student.namaLengkap}</h2>
         <Tabs defaultValue="dataPribadi" className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
