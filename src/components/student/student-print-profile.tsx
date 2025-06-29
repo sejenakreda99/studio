@@ -4,6 +4,7 @@
 import Image from 'next/image';
 import type { Student } from '@/types/student';
 import type { PrintSettings } from '@/types/settings';
+import { cn } from '@/lib/utils';
 
 const DataField = ({ label, value }: { label: string; value: any }) => {
     const displayValue = value === null || value === undefined || value === '' ? '-' : Array.isArray(value) && value.length > 0 ? value.join(', ') : Array.isArray(value) ? '-' : String(value);
@@ -22,8 +23,8 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
   </h3>
 );
 
-const DataSection = ({ children }: { children: React.ReactNode }) => (
-    <table className="w-full border-collapse text-xs">
+const DataSection = ({ children, className }: { children: React.ReactNode, className?: string }) => (
+    <table className={cn("w-full border-collapse text-xs", className)}>
         <tbody>
             {children}
         </tbody>
@@ -73,49 +74,72 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
           <p className="text-xs">Tahun Pelajaran {academicYear}</p>
       </div>
       
+      <SectionTitle>A. DATA PRIBADI</SectionTitle>
       <div className="flex flex-row gap-6">
-        <div className="w-2/3 flex-grow">
-          <SectionTitle>A. DATA PRIBADI</SectionTitle>
-          <DataSection>
-            <DataField label="Nama Lengkap" value={student.namaLengkap} />
-            <DataField label="Jenis Kelamin" value={student.jenisKelamin} />
-            <DataField label="NIS" value={student.nis} />
-            <DataField label="NISN" value={student.nisn} />
-            <DataField label="NIK" value={student.nik} />
-            <DataField label="No. Kartu Keluarga" value={student.noKk} />
-            <DataField label="Tempat, Tanggal Lahir" value={`${student.tempatLahir || '-'}, ${student.tanggalLahir || '-'}`} />
-            <DataField label="No. Registrasi Akta Lahir" value={student.noRegistrasiAktaLahir} />
-            <DataField label="Agama" value={student.agama} />
-            <DataField label="Kewarganegaraan" value={student.kewarganegaraan} />
-            {student.kewarganegaraan === 'WNA' && <DataField label="Nama Negara" value={student.namaNegara} />}
-            <DataField label="Alamat Jalan" value={student.alamatJalan} />
-            <DataField label="RT / RW" value={`${student.rt || '-'} / ${student.rw || '-'}`} />
-            <DataField label="Dusun" value={student.namaDusun} />
-            <DataField label="Kelurahan / Desa" value={student.namaKelurahanDesa} />
-            <DataField label="Kecamatan" value={student.kecamatan} />
-            <DataField label="Kode Pos" value={student.kodePos} />
-            <DataField label="Tempat Tinggal" value={student.tempatTinggal} />
-            <DataField label="Moda Transportasi" value={student.modaTransportasi} />
-            <DataField label="Anak Ke-" value={student.anakKeberapa} />
-            <DataField label="Status Anak" value={student.statusAnak} />
-            <DataField label="Jumlah Saudara Kandung" value={student.jumlahSaudaraKandung} />
-            <DataField label="Jumlah Saudara Tiri" value={student.jumlahSaudaraTiri} />
-            <DataField label="Punya KIP?" value={student.punyaKip} />
-            <DataField label="Asal Sekolah (SMP/MTs)" value={student.sekolahAsal} />
-            <DataField label="Tinggi Badan (cm)" value={student.tinggiBadan} />
-            <DataField label="Berat Badan (kg)" value={student.beratBadan} />
-            <DataField label="Lingkar Kepala (cm)" value={student.lingkarKepala} />
-            <DataField label="Hobi" value={student.hobi} />
-            <DataField label="Cita-cita" value={student.citaCita} />
-            <DataField label="Berkebutuhan Khusus Siswa" value={student.berkebutuhanKhusus} />
-          </DataSection>
+        <div className="w-4/5 flex-grow">
+            <div className="flex flex-row gap-6">
+                 {/* Left Column */}
+                <div className="w-1/2">
+                    <DataSection>
+                        <DataField label="Nama Lengkap" value={student.namaLengkap} />
+                        <DataField label="Jenis Kelamin" value={student.jenisKelamin} />
+                        <DataField label="NIS" value={student.nis} />
+                        <DataField label="NISN" value={student.nisn} />
+                        <DataField label="NIK" value={student.nik} />
+                        <DataField label="No. Kartu Keluarga" value={student.noKk} />
+                        <DataField label="Tempat, Tanggal Lahir" value={`${student.tempatLahir || '-'}, ${student.tanggalLahir || '-'}`} />
+                        <DataField label="No. Registrasi Akta Lahir" value={student.noRegistrasiAktaLahir} />
+                        <DataField label="Agama" value={student.agama} />
+                        <DataField label="Kewarganegaraan" value={student.kewarganegaraan} />
+                        {student.kewarganegaraan === 'WNA' && <DataField label="Nama Negara" value={student.namaNegara} />}
+                    </DataSection>
+                </div>
+                {/* Right Column */}
+                <div className="w-1/2">
+                     <DataSection>
+                        <DataField label="Alamat Jalan" value={student.alamatJalan} />
+                        <DataField label="RT / RW" value={`${student.rt || '-'} / ${student.rw || '-'}`} />
+                        <DataField label="Dusun" value={student.namaDusun} />
+                        <DataField label="Kelurahan / Desa" value={student.namaKelurahanDesa} />
+                        <DataField label="Kecamatan" value={student.kecamatan} />
+                        <DataField label="Kode Pos" value={student.kodePos} />
+                        <DataField label="Tempat Tinggal" value={student.tempatTinggal} />
+                        <DataField label="Moda Transportasi" value={student.modaTransportasi} />
+                        <DataField label="Status Anak" value={student.statusAnak} />
+                        <DataField label="Anak Ke-" value={student.anakKeberapa} />
+                    </DataSection>
+                </div>
+            </div>
+             <div className="flex flex-row gap-6 mt-2">
+                 <div className="w-1/2">
+                    <DataSection>
+                         <DataField label="Jumlah Saudara Kandung" value={student.jumlahSaudaraKandung} />
+                         <DataField label="Tinggi Badan (cm)" value={student.tinggiBadan} />
+                         <DataField label="Lingkar Kepala (cm)" value={student.lingkarKepala} />
+                         <DataField label="Hobi" value={student.hobi} />
+                    </DataSection>
+                 </div>
+                 <div className="w-1/2">
+                     <DataSection>
+                         <DataField label="Jumlah Saudara Tiri" value={student.jumlahSaudaraTiri} />
+                         <DataField label="Berat Badan (kg)" value={student.beratBadan} />
+                         <DataField label="Punya KIP?" value={student.punyaKip} />
+                         <DataField label="Cita-cita" value={student.citaCita} />
+                     </DataSection>
+                 </div>
+            </div>
+             <DataSection className="mt-2">
+                <DataField label="Asal Sekolah (SMP/MTs)" value={student.sekolahAsal} />
+                <DataField label="Berkebutuhan Khusus Siswa" value={student.berkebutuhanKhusus} />
+            </DataSection>
         </div>
-        <div className="w-1/3 flex-shrink-0">
-          <div className="w-32 h-40 border-2 border-gray-400 flex items-center justify-center text-gray-400 text-xs text-center mx-auto mb-4">
+        <div className="w-1/5 flex-shrink-0">
+          <div className="w-32 h-40 border-2 border-gray-400 flex items-center justify-center text-gray-400 text-xs text-center mx-auto">
               Pas Foto 3x4
           </div>
         </div>
       </div>
+
 
       <SectionTitle>B. DATA AYAH KANDUNG</SectionTitle>
       <DataSection>
