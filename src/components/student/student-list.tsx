@@ -3,7 +3,7 @@
 
 import { useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { MoreHorizontal, UserPlus, FileDown, Upload, FileUp, Search, CalendarIcon } from 'lucide-react';
+import { MoreHorizontal, UserPlus, FileDown, Upload, FileUp, Search, CalendarIcon, Trash2, CheckCircle, ChevronDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { DateRange } from "react-day-picker";
 import { format, isAfter, isBefore, isEqual } from 'date-fns';
@@ -60,6 +60,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
+import { Checkbox } from '../ui/checkbox';
 
 
 const excelColumns = [
@@ -110,6 +111,8 @@ interface StudentListProps {
   onUpdateStatus: (studentId: string, status: string, catatan?: string) => Promise<void>;
   onDeleteStudent: (studentId: string) => Promise<void>;
   onImportStudents: (newStudents: Partial<StudentFormValues>[]) => Promise<void>;
+  onBulkDelete: (studentIds: string[]) => Promise<void>;
+  onBulkUpdateStatus: (studentIds: string[], status: string) => Promise<void>;
 }
 
 const totalFields = Object.keys(studentFormSchema.shape).length;
@@ -128,7 +131,14 @@ const calculateCompleteness = (student: Student): number => {
 };
 
 
-export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImportStudents }: StudentListProps) {
+export function StudentList({ 
+  students, 
+  onUpdateStatus, 
+  onDeleteStudent, 
+  onImportStudents,
+  onBulkDelete,
+  onBulkUpdateStatus
+}: StudentListProps) {
   const router = useRouter();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -136,10 +146,12 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
   const [activeTab, setActiveTab] = useState('all');
   const [residuDialog, setResiduDialog] = useState<{ open: boolean; studentId: string | null }>({ open: false, studentId: null });
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; studentId: string | null, studentName: string | null }>({ open: false, studentId: null, studentName: null });
+  const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
   const [catatan, setCatatan] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [date, setDate] = useState<DateRange | undefined>(undefined);
   const [completenessFilter, setCompletenessFilter] = useState<string>('Semua');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
 
   const handleOpenResiduDialog = (studentId: string) => {
@@ -164,6 +176,12 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
       await onDeleteStudent(deleteDialog.studentId);
       setDeleteDialog({ open: false, studentId: null, studentName: null });
     }
+  };
+
+  const handleSubmitBulkDelete = async () => {
+    await onBulkDelete(selectedIds);
+    setBulkDeleteDialog(false);
+    setSelectedIds([]);
   };
 
   const filteredStudents = useMemo(() => {
@@ -194,6 +212,11 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
     });
   }, [students, searchTerm, activeTab, date, completenessFilter]);
   
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [activeTab, searchTerm, date, completenessFilter]);
+
+
   const studentsByStatus = useMemo(() => ({
     all: students,
     unverified: students.filter(s => s.statusValidasi === 'Belum Diverifikasi' || !s.statusValidasi),
@@ -201,32 +224,29 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
     residual: students.filter(s => s.statusValidasi === 'Residu'),
   }), [students]);
 
-  const handleExportToExcel = () => {
-    const studentsToExport = filteredStudents;
+  const handleExportToExcel = (onlySelected = false) => {
+    const studentsToExport = onlySelected
+        ? students.filter(s => selectedIds.includes(s.id))
+        : filteredStudents;
+
     if (studentsToExport.length === 0) {
       toast({
         variant: "destructive",
         title: "Tidak Ada Data",
-        description: "Tidak ada data siswa untuk diunduh sesuai filter yang dipilih.",
+        description: `Tidak ada data siswa ${onlySelected ? 'yang dipilih' : 'untuk diunduh sesuai filter'}.`,
       });
       return;
     }
   
-    // Define group headers and their column spans
     const groupHeadersConfig = [
-        { title: ' ', span: 1 }, // For 'No. Urut'
-        { title: 'Data Pribadi', span: 33 },
-        { title: 'Data Ayah', span: 8 },
-        { title: 'Data Ibu', span: 8 },
-        { title: 'Data Wali', span: 6 },
-        { title: 'Kontak', span: 3 },
-        { title: 'Status Pendaftaran', span: 3 },
+        { title: ' ', span: 1 }, 
+        { title: 'Data Pribadi', span: 33 }, { title: 'Data Ayah', span: 8 },
+        { title: 'Data Ibu', span: 8 }, { title: 'Data Wali', span: 6 },
+        { title: 'Kontak', span: 3 }, { title: 'Status Pendaftaran', span: 3 },
     ];
   
-    // Main title row
     const mainHeaderRow = ['REKAPITULASI DATA SISWA'];
   
-    // Group header row
     const groupHeaderRow: string[] = [];
     const merges = [];
     let currentCol = 0;
@@ -234,73 +254,43 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
       groupHeaderRow.push(group.title);
       if (group.span > 1) {
         merges.push({ s: { r: 2, c: currentCol }, e: { r: 2, c: currentCol + group.span - 1 } });
-        // Add empty cells for the merge
-        for (let i = 1; i < group.span; i++) {
-          groupHeaderRow.push('');
-        }
+        for (let i = 1; i < group.span; i++) groupHeaderRow.push('');
       }
       currentCol += group.span;
     }
-     // Main header merge
     merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: currentCol - 1 } });
   
-  
-    // Individual column headers
     const columnHeaderRow = [
-      'No. Urut',
-      ...excelColumns.map(c => c.header),
-      'Tanggal Registrasi (DD-MM-YYYY)',
-      'Status Validasi',
-      'Catatan Validasi'
+      'No. Urut', ...excelColumns.map(c => c.header),
+      'Tanggal Registrasi (DD-MM-YYYY)', 'Status Validasi', 'Catatan Validasi'
     ];
   
-    // Prepare all header rows for the worksheet
-    const worksheetData = [
-      mainHeaderRow,
-      [], // Empty row for spacing
-      groupHeaderRow,
-      columnHeaderRow
-    ];
+    const worksheetData = [ mainHeaderRow, [], groupHeaderRow, columnHeaderRow ];
     
-    // Prepare student data rows
     const dataToExport = studentsToExport.map((student, index) => {
-      const row: any[] = [index + 1]; // No. Urut
+      const row: any[] = [index + 1];
       excelColumns.forEach(col => {
         let value = student[col.key as keyof Student];
-        if (Array.isArray(value)) {
-          value = value.join(', ');
-        }
+        if (Array.isArray(value)) value = value.join(', ');
         row.push(value ?? '');
       });
-      row.push(
-          student.tanggalRegistrasi,
-          student.statusValidasi ?? '',
-          student.catatanValidasi ?? ''
-      );
+      row.push(student.tanggalRegistrasi, student.statusValidasi ?? '', student.catatanValidasi ?? '');
       return row;
     });
   
-    // Create worksheet from headers
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    
-    // Add student data starting from row 5 (index 4)
     XLSX.utils.sheet_add_aoa(worksheet, dataToExport, { origin: 'A5' });
   
-    // Apply merges
     worksheet['!merges'] = merges;
-    
-    // Auto-filter on the column header row (row 4, index 3)
     const filterRange = `A4:${XLSX.utils.encode_col(columnHeaderRow.length - 1)}4`;
     worksheet['!autofilter'] = { ref: filterRange };
   
-    // Auto-fit column widths
-    const allDataForWidthCalc = [...worksheetData.slice(2), ...dataToExport]; // Use group, column, and data rows for width calculation
+    const allDataForWidthCalc = [...worksheetData.slice(2), ...dataToExport];
     const colWidths = columnHeaderRow.map((_, i) => ({
       wch: Math.max(...allDataForWidthCalc.map(row => (row[i] ? row[i].toString().length : 0))) + 2,
     }));
     worksheet['!cols'] = colWidths;
     
-    // Create and download workbook
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Siswa');
     XLSX.writeFile(workbook, 'Data_Siswa.xlsx');
@@ -368,11 +358,36 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
         </div>
       );
     }
+    
+    const isAllSelected = selectedIds.length > 0 && selectedIds.length === studentList.length;
+    const isSomeSelected = selectedIds.length > 0 && selectedIds.length < studentList.length;
+
+    const handleSelectAll = (checked: boolean) => {
+      if (checked) {
+        setSelectedIds(studentList.map(s => s.id));
+      } else {
+        setSelectedIds([]);
+      }
+    };
+    
+    const handleSelectRow = (id: string, checked: boolean) => {
+      setSelectedIds(prev => 
+        checked ? [...prev, id] : prev.filter(sid => sid !== id)
+      );
+    };
+
 
     return (
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[50px]">
+               <Checkbox
+                checked={isAllSelected}
+                onCheckedChange={handleSelectAll}
+                aria-label="Pilih semua"
+              />
+            </TableHead>
             <TableHead>No. Urut</TableHead>
             <TableHead>Nama Lengkap</TableHead>
             <TableHead className="hidden md:table-cell">NISN</TableHead>
@@ -387,7 +402,14 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
         </TableHeader>
         <TableBody>
           {studentList.map((student, index) => (
-            <TableRow key={student.id}>
+            <TableRow key={student.id} data-state={selectedIds.includes(student.id) ? "selected" : ""}>
+              <TableCell>
+                 <Checkbox
+                    checked={selectedIds.includes(student.id)}
+                    onCheckedChange={(checked) => handleSelectRow(student.id, !!checked)}
+                    aria-label={`Pilih ${student.namaLengkap}`}
+                  />
+              </TableCell>
               <TableCell>{index + 1}</TableCell>
               <TableCell className="font-medium">{student.namaLengkap}</TableCell>
               <TableCell className="hidden md:table-cell">{student.nisn || '-'}</TableCell>
@@ -469,7 +491,7 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
                     <FileUp className="mr-2 h-4 w-4" />
                     Impor
                 </Button>
-                <Button variant="outline" onClick={handleExportToExcel}>
+                <Button variant="outline" onClick={() => handleExportToExcel()}>
                     <Upload className="mr-2 h-4 w-4" />
                     Ekspor
                 </Button>
@@ -481,75 +503,79 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
                 </Button>
             </div>
         </div>
-        <div className="pt-4 flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input 
-                    placeholder="Cari nama atau NISN..." 
-                    className="pl-10"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+         <div className="pt-4 flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input 
+                  placeholder="Cari nama atau NISN..." 
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  disabled={selectedIds.length > 0}
+              />
+          </div>
+          {selectedIds.length > 0 ? (
+            <div className="flex gap-2 items-center">
+               <span className="text-sm text-muted-foreground">{selectedIds.length} dipilih</span>
+               <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    Aksi Massal
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onBulkUpdateStatus(selectedIds, 'Valid')}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Tandai Valid
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExportToExcel(true)}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Ekspor Terpilih
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-destructive focus:bg-destructive focus:text-destructive-foreground" onClick={() => setBulkDeleteDialog(true)}>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Hapus Terpilih
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
+          ) : (
             <div className="flex gap-4 flex-col sm:flex-row">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="date"
-                      variant={"outline"}
-                      className={cn(
-                        "w-full sm:w-[260px] justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date?.from ? (
-                        date.to ? (
-                          <>
-                            {format(date.from, "LLL dd, y")} -{" "}
-                            {format(date.to, "LLL dd, y")}
-                          </>
-                        ) : (
-                          format(date.from, "LLL dd, y")
-                        )
-                      ) : (
-                        <span>Pilih tanggal registrasi</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <Calendar
-                      initialFocus
-                      mode="range"
-                      defaultMonth={date?.from}
-                      selected={date}
-                      onSelect={setDate}
-                      numberOfMonths={2}
-                    />
-                  </PopoverContent>
-                </Popover>
-
-                 <Select value={completenessFilter} onValueChange={setCompletenessFilter}>
-                    <SelectTrigger className="w-full sm:w-[220px]">
-                        <SelectValue placeholder="Filter Kelengkapan Data" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Semua">Semua Kelengkapan</SelectItem>
-                        <SelectItem value="lengkap">Lengkap (&gt;80%)</SelectItem>
-                        <SelectItem value="cukup">Cukup Lengkap (50-80%)</SelectItem>
-                        <SelectItem value="kurang">Kurang Lengkap (&lt;50%)</SelectItem>
-                    </SelectContent>
-                </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button id="date" variant={"outline"} className={cn("w-full sm:w-[260px] justify-start text-left font-normal", !date && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date?.from ? (date.to ? (<>{format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}</>) : (format(date.from, "LLL dd, y"))) : (<span>Pilih tanggal registrasi</span>)}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar initialFocus mode="range" defaultMonth={date?.from} selected={date} onSelect={setDate} numberOfMonths={2}/>
+                </PopoverContent>
+              </Popover>
+              <Select value={completenessFilter} onValueChange={setCompletenessFilter}>
+                  <SelectTrigger className="w-full sm:w-[220px]">
+                      <SelectValue placeholder="Filter Kelengkapan Data" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="Semua">Semua Kelengkapan</SelectItem>
+                      <SelectItem value="lengkap">Lengkap (&gt;80%)</SelectItem>
+                      <SelectItem value="cukup">Cukup Lengkap (50-80%)</SelectItem>
+                      <SelectItem value="kurang">Kurang Lengkap (&lt;50%)</SelectItem>
+                  </SelectContent>
+              </Select>
             </div>
+          )}
         </div>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all">Semua ({studentsByStatus.all.length})</TabsTrigger>
-            <TabsTrigger value="unverified">Belum Diverifikasi ({studentsByStatus.unverified.length})</TabsTrigger>
-            <TabsTrigger value="valid">Valid ({studentsByStatus.valid.length})</TabsTrigger>
-            <TabsTrigger value="residual">Residu ({studentsByStatus.residual.length})</TabsTrigger>
+            <TabsTrigger value="all" disabled={selectedIds.length > 0}>Semua ({studentsByStatus.all.length})</TabsTrigger>
+            <TabsTrigger value="unverified" disabled={selectedIds.length > 0}>Belum Diverifikasi ({studentsByStatus.unverified.length})</TabsTrigger>
+            <TabsTrigger value="valid" disabled={selectedIds.length > 0}>Valid ({studentsByStatus.valid.length})</TabsTrigger>
+            <TabsTrigger value="residual" disabled={selectedIds.length > 0}>Residu ({studentsByStatus.residual.length})</TabsTrigger>
           </TabsList>
             <div className="pt-4">
              {renderStudentTable(filteredStudents, activeTab === 'all' ? 'Klik tombol "Tambah Siswa" untuk memulai.' : 'Tidak ada siswa yang cocok dengan filter ini.')}
@@ -583,7 +609,6 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
           </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
-
     <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -594,15 +619,28 @@ export function StudentList({ students, onUpdateStatus, onDeleteStudent, onImpor
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setDeleteDialog({ open: false, studentId: null, studentName: null })}>Batal</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleSubmitDelete}
-              className={buttonVariants({ variant: "destructive" })}
-            >
+            <AlertDialogAction onClick={handleSubmitDelete} className={buttonVariants({ variant: "destructive" })}>
               Hapus Permanen
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+    </AlertDialog>
+    <AlertDialog open={bulkDeleteDialog} onOpenChange={setBulkDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Anda Yakin?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini tidak dapat dibatalkan. Ini akan menghapus <strong>{selectedIds.length} data siswa</strong> yang dipilih secara permanen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setBulkDeleteDialog(false)}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSubmitBulkDelete} className={buttonVariants({ variant: "destructive" })}>
+              Hapus Permanen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
     </>
   );
 }

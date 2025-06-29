@@ -243,13 +243,75 @@ export default function StudentListPage() {
         title: "Impor Berhasil!",
         description: `${newStudents.length} data siswa baru telah berhasil diimpor.`,
       });
-      fetchStudents(); // Refresh the student list
+      fetchStudents(); 
     } catch (error) {
       console.error("Error importing students: ", error);
       toast({
         variant: "destructive",
         title: "Gagal Mengimpor Data",
         description: "Terjadi kesalahan. Pastikan format file Excel Anda benar.",
+      });
+    } finally {
+      dismiss();
+    }
+  };
+
+  const handleBulkDelete = async (studentIds: string[]) => {
+    const { dismiss } = toast({
+      title: `Menghapus ${studentIds.length} data...`,
+      description: 'Mohon tunggu, data siswa sedang dihapus dari sistem.',
+    });
+
+    try {
+      const batch = writeBatch(db);
+      studentIds.forEach(id => {
+        const studentRef = doc(db, 'students', id);
+        batch.delete(studentRef);
+      });
+      await batch.commit();
+
+      setStudents(prev => prev.filter(s => !studentIds.includes(s.id)));
+      toast({
+        title: "Hapus Massal Berhasil!",
+        description: `${studentIds.length} data siswa telah dihapus.`,
+      });
+    } catch (error) {
+       console.error("Error bulk deleting students: ", error);
+      toast({
+        variant: "destructive",
+        title: "Gagal Menghapus Data",
+        description: "Terjadi kesalahan saat menghapus data siswa secara massal.",
+      });
+    } finally {
+      dismiss();
+    }
+  };
+
+  const handleBulkUpdateStatus = async (studentIds: string[], status: string) => {
+     const { dismiss } = toast({
+      title: `Memperbarui ${studentIds.length} data...`,
+      description: `Status siswa sedang diubah menjadi ${status}.`,
+    });
+
+    try {
+      const batch = writeBatch(db);
+      studentIds.forEach(id => {
+        const studentRef = doc(db, 'students', id);
+        batch.update(studentRef, { statusValidasi: status, catatanValidasi: null });
+      });
+      await batch.commit();
+
+      setStudents(prev => prev.map(s => studentIds.includes(s.id) ? { ...s, statusValidasi: status, catatanValidasi: null } : s));
+      toast({
+        title: "Pembaruan Massal Berhasil!",
+        description: `${studentIds.length} data siswa telah diperbarui menjadi ${status}.`,
+      });
+    } catch (error) {
+       console.error("Error bulk updating students: ", error);
+      toast({
+        variant: "destructive",
+        title: "Gagal Memperbarui Data",
+        description: "Terjadi kesalahan saat memperbarui status siswa secara massal.",
       });
     } finally {
       dismiss();
@@ -277,6 +339,8 @@ export default function StudentListPage() {
       onUpdateStatus={handleUpdateStudentStatus} 
       onDeleteStudent={handleDeleteStudent}
       onImportStudents={handleImportStudents}
+      onBulkDelete={handleBulkDelete}
+      onBulkUpdateStatus={handleBulkUpdateStatus}
     />
   );
 }

@@ -21,9 +21,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { CalendarIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon, Loader2, Printer } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Student } from '@/types/student';
+import Link from 'next/link';
 
 const agamaOptions = ['Islam', 'Kristen/Protestan', 'Katholik', 'Hindu', 'Budha', 'Khonghucu', 'Kepercayaan Kepada Tuhan YME'];
 const kebutuhanKhususOptions = [
@@ -324,9 +325,15 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
         </Tabs>
         
         <div className="flex justify-end gap-4 mt-6">
-           <Button type="button" variant="outline" size="lg" onClick={() => router.back()}>
+          <Button type="button" variant="outline" size="lg" onClick={() => router.back()}>
             Batal
           </Button>
+           <Link href={`/dashboard/print-student/${student.id}`} target="_blank" passHref>
+             <Button type="button" variant="outline" size="lg">
+                <Printer className="mr-2 h-4 w-4"/>
+                Cetak Profil
+             </Button>
+           </Link>
           <Button type="submit" size="lg" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Simpan Perubahan
