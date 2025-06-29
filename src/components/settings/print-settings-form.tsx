@@ -21,7 +21,9 @@ const settingsSchema = z.object({
   signaturePlace: z.string().min(1, 'Tempat tanda tangan harus diisi.'),
   committeeHeadTitle: z.string().min(1, 'Jabatan harus diisi.'),
   committeeHeadName: z.string().min(1, 'Nama lengkap harus diisi.'),
-  committeeHeadId: z.string().optional().nullable(),
+  committeeHeadNuptk: z.string().optional().nullable(),
+  committeeHeadNip: z.string().optional().nullable(),
+  committeeHeadNpa: z.string().optional().nullable(),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -42,7 +44,9 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
       signaturePlace: initialData?.signaturePlace || 'Naringgul',
       committeeHeadTitle: initialData?.committeeHeadTitle || 'Kepala SMAS PGRI Naringgul,',
       committeeHeadName: initialData?.committeeHeadName || 'H. SUTARDI, S.Pd',
-      committeeHeadId: initialData?.committeeHeadId || '',
+      committeeHeadNuptk: initialData?.committeeHeadNuptk || '',
+      committeeHeadNip: initialData?.committeeHeadNip || '',
+      committeeHeadNpa: initialData?.committeeHeadNpa || '',
     },
   });
 
@@ -214,22 +218,53 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
                 </FormItem>
               )}
             />
-             <FormField
-              control={form.control}
-              name="committeeHeadId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>NUPTK / NPA / NIP</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Masukkan nomor identitas pegawai" {...field} value={field.value || ''} />
-                  </FormControl>
-                  <FormDescription>
-                    Nomor identitas unik penandatangan (opsional).
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2">
+                <FormLabel>Nomor Identitas Penandatangan</FormLabel>
+                <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3">
+                  <FormField
+                    control={form.control}
+                    name="committeeHeadNuptk"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-normal text-muted-foreground">NUPTK</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nomor Unik Pendidik" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="committeeHeadNip"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-normal text-muted-foreground">NIP</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nomor Induk Pegawai" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="committeeHeadNpa"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-normal text-muted-foreground">NPA</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nomor Pokok Anggota" {...field} value={field.value || ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormDescription>
+                  Isi salah satu nomor identitas. Nomor yang diisi akan ditampilkan pada hasil cetak.
+                </FormDescription>
+            </div>
             <div className="flex justify-end">
                 <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -242,5 +277,3 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
     </Card>
   );
 }
-
-    

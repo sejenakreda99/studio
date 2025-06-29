@@ -5,5 +5,7 @@ export interface PrintSettings {
   signaturePlace: string | null;
   committeeHeadTitle: string | null;
   committeeHeadName: string | null;
-  committeeHeadId: string | null;
+  committeeHeadNuptk: string | null;
+  committeeHeadNip: string | null;
+  committeeHeadNpa: string | null;
 }

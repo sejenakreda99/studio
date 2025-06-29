@@ -27,6 +27,17 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
   const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   const signaturePlace = settings?.signaturePlace || "Naringgul";
 
+  let committeeIdDisplay = '';
+  if (settings) {
+    if (settings.committeeHeadNuptk) {
+      committeeIdDisplay = `NUPTK. ${settings.committeeHeadNuptk}`;
+    } else if (settings.committeeHeadNip) {
+      committeeIdDisplay = `NIP. ${settings.committeeHeadNip}`;
+    } else if (settings.committeeHeadNpa) {
+      committeeIdDisplay = `NPA. ${settings.committeeHeadNpa}`;
+    }
+  }
+
   return (
     <div className="border p-6 print:border-none aspect-[1/1.414] page-break-after">
       <header className="text-center mb-4 border-b-4 border-black pb-2">
@@ -123,7 +134,7 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
                   <p>{settings?.committeeHeadTitle || 'Kepala SMAS PGRI Naringgul,'}</p>
                   <div className="h-16"></div>
                   <p className="font-bold underline uppercase">{settings?.committeeHeadName || 'H. SUTARDI, S.Pd'}</p>
-                  <p>{settings?.committeeHeadId ? `NUPTK. ${settings.committeeHeadId}` : ''}</p>
+                  <p>{committeeIdDisplay}</p>
               </div>
           </div>
            <div className="mt-4 pt-2 border-t text-center text-[8px] text-gray-500 no-print">
