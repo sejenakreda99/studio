@@ -129,12 +129,20 @@ export function AddStudentForm() {
   async function onSubmit(data: StudentFormValues) {
     setIsLoading(true);
     try {
-      const processedData = {
+      const processedData: { [key: string]: any } = {
         ...data,
         tanggalRegistrasi: data.tanggalRegistrasi ? format(data.tanggalRegistrasi, 'yyyy-MM-dd') : null,
         tanggalLahir: data.tanggalLahir ? format(data.tanggalLahir, 'yyyy-MM-dd') : null,
         statusValidasi: 'Belum Diverifikasi',
       };
+      
+      // Firestore doesn't support 'undefined'. We'll convert them to 'null'.
+      for (const key in processedData) {
+        if (processedData[key] === undefined) {
+          processedData[key] = null;
+        }
+      }
+
       await addDoc(collection(db, 'students'), processedData);
       toast({
         title: 'Sukses',
