@@ -1,3 +1,4 @@
+
 import * as z from 'zod';
 
 const optionalString = z.string().optional().or(z.literal(''));
@@ -38,6 +39,7 @@ export const studentFormSchema = z.object({
   jumlahSaudaraTiri: optionalString,
   hobi: optionalString,
   citaCita: optionalString,
+  statusValidasi: optionalString,
 
   // DATA AYAH KANDUNG
   namaAyah: optionalString,

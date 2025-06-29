@@ -109,6 +109,7 @@ export function AddStudentForm() {
       jumlahSaudaraTiri: '',
       hobi: '',
       citaCita: '',
+      statusValidasi: 'Belum Diverifikasi',
     },
   });
 
@@ -132,6 +133,7 @@ export function AddStudentForm() {
         ...data,
         tanggalRegistrasi: data.tanggalRegistrasi ? format(data.tanggalRegistrasi, 'yyyy-MM-dd') : null,
         tanggalLahir: data.tanggalLahir ? format(data.tanggalLahir, 'yyyy-MM-dd') : null,
+        statusValidasi: 'Belum Diverifikasi',
       };
       await addDoc(collection(db, 'students'), processedData);
       toast({

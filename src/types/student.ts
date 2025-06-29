@@ -1,3 +1,4 @@
+
 import type { StudentFormValues } from '@/lib/schemas/student-schema';
 
 // Type for student data fetched from Firestore, where dates are strings.
@@ -5,4 +6,5 @@ export type Student = Omit<StudentFormValues, 'tanggalLahir' | 'tanggalRegistras
   id: string;
   tanggalLahir: string | null;
   tanggalRegistrasi: string | null;
+  statusValidasi: string;
 };

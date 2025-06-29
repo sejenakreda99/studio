@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, doc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
@@ -13,6 +13,7 @@ import type { Student } from '@/types/student';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 
 async function getStudents(): Promise<Student[]> {
@@ -86,6 +87,7 @@ async function getStudents(): Promise<Student[]> {
         jumlahSaudaraTiri: data.jumlahSaudaraTiri || '',
         hobi: data.hobi || '',
         citaCita: data.citaCita || '',
+        statusValidasi: data.statusValidasi || 'Belum Diverifikasi',
       };
     });
 
@@ -126,6 +128,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     // onAuthStateChanged is the recommended way to get the current user.
@@ -152,6 +155,30 @@ export default function DashboardPage() {
     return () => unsubscribe();
   }, [router]);
 
+  const handleUpdateStudentStatus = async (studentId: string, status: string) => {
+    const studentRef = doc(db, 'students', studentId);
+    try {
+      await updateDoc(studentRef, { statusValidasi: status });
+      setStudents(prevStudents =>
+        prevStudents.map(student =>
+          student.id === studentId ? { ...student, statusValidasi: status } : student
+        )
+      );
+      toast({
+        title: "Status Berhasil Diperbarui",
+        description: `Status siswa telah diubah menjadi ${status}.`,
+      });
+    } catch (error) {
+      console.error("Error updating student status: ", error);
+      toast({
+        variant: "destructive",
+        title: "Gagal Memperbarui Status",
+        description: "Terjadi kesalahan saat memperbarui status siswa.",
+      });
+    }
+  };
+
+
   if (isLoading) {
     return <DashboardSkeleton />;
   }
@@ -166,5 +193,5 @@ export default function DashboardPage() {
     );
   }
 
-  return <StudentList students={students} />;
+  return <StudentList students={students} onUpdateStatus={handleUpdateStudentStatus} />;
 }
