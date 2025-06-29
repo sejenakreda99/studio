@@ -59,51 +59,65 @@ export default function PrintStudentPage() {
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [authStatus, setAuthStatus] = useState<'checking' | 'authenticated' | 'unauthenticated'>('checking');
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setAuthStatus('authenticated');
+      } else {
+        setAuthStatus('unauthenticated');
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (authStatus === 'checking') {
+      return; // Do nothing while auth state is being determined
+    }
+
+    if (authStatus === 'unauthenticated') {
+      setError('Otentikasi dibutuhkan. Silakan login terlebih dahulu.');
+      setIsLoading(false);
+      return;
+    }
+    
     if (!studentId) {
         setIsLoading(false);
         setError("ID Siswa tidak valid.");
         return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const fetchStudent = async () => {
-                setIsLoading(true);
-                setError(null);
-                try {
-                    const studentDocRef = doc(db, 'students', studentId);
-                    const studentDoc = await getDoc(studentDocRef);
+    const fetchStudent = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const studentDocRef = doc(db, 'students', studentId);
+            const studentDoc = await getDoc(studentDocRef);
 
-                    if (studentDoc.exists()) {
-                        setStudent({ id: studentDoc.id, ...studentDoc.data() } as Student);
-                    } else {
-                        setError('Siswa tidak ditemukan.');
-                    }
-                } catch (err: any) {
-                    console.error('Error fetching student data:', err);
-                    if (err.code === 'permission-denied') {
-                        setError('Anda tidak memiliki izin untuk melihat data ini. Pastikan Anda sudah login.');
-                    } else {
-                        setError('Gagal memuat data siswa.');
-                    }
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-            fetchStudent();
-        } else {
-            setError('Otentikasi dibutuhkan. Silakan login terlebih dahulu.');
+            if (studentDoc.exists()) {
+                setStudent({ id: studentDoc.id, ...studentDoc.data() } as Student);
+            } else {
+                setError('Siswa tidak ditemukan.');
+            }
+        } catch (err: any) {
+            console.error('Error fetching student data:', err);
+            if (err.code === 'permission-denied') {
+                setError('Anda tidak memiliki izin untuk melihat data ini. Pastikan Anda sudah login.');
+            } else {
+                setError('Gagal memuat data siswa.');
+            }
+        } finally {
             setIsLoading(false);
         }
-    });
+    };
+    
+    fetchStudent();
+  }, [studentId, authStatus]);
 
-    return () => unsubscribe();
-  }, [studentId]);
 
-
-  if (isLoading) {
+  if (isLoading || authStatus === 'checking') {
     return <PrintSkeleton />;
   }
 
