@@ -110,7 +110,7 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
                 <FormItem>
                   <FormLabel>Gambar Kop Surat</FormLabel>
                   <FormControl>
-                    <>
+                    <div>
                       <input
                         type="file"
                         ref={fileInputRef}
@@ -131,7 +131,7 @@ export function PrintSettingsForm({ initialData }: PrintSettingsFormProps) {
                         )}
                         {isUploading ? 'Mengunggah...' : 'Pilih Gambar Kop Surat'}
                       </Button>
-                    </>
+                    </div>
                   </FormControl>
                   <FormDescription>
                     Unggah gambar kop surat Anda (format PNG, JPG). Biarkan kosong untuk menggunakan teks default.
