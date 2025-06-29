@@ -72,18 +72,16 @@ export function ReportsDashboard({ students }: ReportsDashboardProps) {
       const orphanStatus = student.statusAnak || 'Tidak';
       orphanStatusData[orphanStatus] = (orphanStatusData[orphanStatus] || 0) + 1;
 
-      // Parent Income & Underprivileged
+      // Parent Income & Underprivileged (based on Father's income only)
       const fatherIncome = student.penghasilanAyah;
-      const motherIncome = student.penghasilanIbu;
       const lowIncomeBrackets = ['< Rp. 500.000', 'Rp. 500.000-Rp.999.999'];
-      if ( (fatherIncome && lowIncomeBrackets.includes(fatherIncome)) || (motherIncome && lowIncomeBrackets.includes(motherIncome)) ) {
-          underprivilegedStudents++;
+
+      if (fatherIncome && lowIncomeBrackets.includes(fatherIncome)) {
+        underprivilegedStudents++;
       }
+      
       if (fatherIncome && fatherIncome !== 'Tidak Berpenghasilan') {
-          parentIncomeData[fatherIncome] = (parentIncomeData[fatherIncome] || 0) + 1;
-      }
-       if (motherIncome && motherIncome !== 'Tidak Berpenghasilan') {
-          parentIncomeData[motherIncome] = (parentIncomeData[motherIncome] || 0) + 1;
+        parentIncomeData[fatherIncome] = (parentIncomeData[fatherIncome] || 0) + 1;
       }
     });
 
@@ -294,7 +292,7 @@ export function ReportsDashboard({ students }: ReportsDashboardProps) {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
            {renderPieChart(reportData.kipData, "Kepemilikan KIP", "Distribusi siswa yang memiliki Kartu Indonesia Pintar (KIP).", CreditCard)}
            {renderPieChart(reportData.orphanStatusData, "Status Yatim Piatu", "Distribusi status anak (yatim, piatu, dll).", HeartHandshake)}
-           {renderPieChart(reportData.underprivilegedData, "Siswa Kurang Mampu", "Berdasarkan penghasilan orang tua di bawah Rp 1.000.000.", HelpingHand)}
+           {renderPieChart(reportData.underprivilegedData, "Siswa Kurang Mampu", "Berdasarkan penghasilan Ayah di bawah Rp 1.000.000.", HelpingHand)}
         </div>
 
          <div className="grid gap-6">
@@ -302,9 +300,9 @@ export function ReportsDashboard({ students }: ReportsDashboardProps) {
                 <CardHeader>
                     <div className="flex items-center gap-2">
                         <Wallet className="h-5 w-5 text-muted-foreground" />
-                        <CardTitle>Rentang Penghasilan Orang Tua</CardTitle>
+                        <CardTitle>Rentang Penghasilan Ayah</CardTitle>
                     </div>
-                    <CardDescription>Agregat rentang penghasilan bulanan Ayah dan Ibu.</CardDescription>
+                    <CardDescription>Distribusi rentang penghasilan bulanan Ayah.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ChartContainer config={{}} className="h-[350px] w-full">
@@ -314,7 +312,7 @@ export function ReportsDashboard({ students }: ReportsDashboardProps) {
                                 <XAxis type="number" />
                                 <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 12 }} />
                                 <Tooltip content={<ChartTooltipContent hideLabel />} cursor={{ fill: 'hsl(var(--muted))' }} />
-                                <Bar dataKey="total" name="Jumlah Orang Tua" fill="hsl(var(--chart-4))" radius={[0, 4, 4, 0]} />
+                                <Bar dataKey="total" name="Jumlah Ayah" fill="hsl(var(--chart-4))" radius={[0, 4, 4, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </ChartContainer>
