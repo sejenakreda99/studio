@@ -10,7 +10,7 @@ const DataField = ({ label, value }: { label: string; value: any }) => {
     const displayValue = value === null || value === undefined || value === '' ? '-' : Array.isArray(value) && value.length === 0 ? '-' : Array.isArray(value) ? value.join(', ') : String(value);
     return (
         <tr>
-            <td className="py-1 align-top w-[130px] text-gray-600">{label}</td>
+            <td className="py-1 align-top w-[170px] text-gray-600">{label}</td>
             <td className="py-1 align-top w-[10px]">:</td>
             <td className="py-1 align-top font-medium text-gray-800">{displayValue}</td>
         </tr>
