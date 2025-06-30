@@ -42,6 +42,7 @@ export async function getStudents(): Promise<Student[]> {
         anakKeberapa: data.anakKeberapa || '',
         statusAnak: data.statusAnak || 'Tidak',
         punyaKip: data.punyaKip,
+        uangMasuk: data.uangMasuk || '',
         namaAyah: data.namaAyah || '',
         statusAyah: data.statusAyah || 'Masih Hidup',
         nikAyah: data.nikAyah || '',

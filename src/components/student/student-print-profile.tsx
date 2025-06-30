@@ -91,6 +91,10 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
                   <DataField label="Agama" value={student.agama} />
                   <DataField label="Kewarganegaraan" value={student.kewarganegaraan} />
                   {student.kewarganegaraan === 'WNA' && <DataField label="Nama Negara" value={student.namaNegara} />}
+                  <DataField label="Status Anak" value={student.statusAnak} />
+                  <DataField label="Anak Ke-" value={student.anakKeberapa} />
+                  <DataField label="Punya KIP?" value={student.punyaKip} />
+                  <DataField label="Keterangan Uang Masuk" value={student.uangMasuk} />
               </DataSection>
               <DataSection>
                   <DataField label="Alamat Jalan" value={student.alamatJalan} />
@@ -101,9 +105,12 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
                   <DataField label="Kode Pos" value={student.kodePos} />
                   <DataField label="Tempat Tinggal" value={student.tempatTinggal} />
                   <DataField label="Moda Transportasi" value={student.modaTransportasi} />
-                  <DataField label="Status Anak" value={student.statusAnak} />
-                  <DataField label="Anak Ke-" value={student.anakKeberapa} />
-                  <DataField label="Punya KIP?" value={student.punyaKip} />
+                  <DataField label="Jumlah Saudara Kandung" value={student.jumlahSaudaraKandung} />
+                  <DataField label="Jumlah Saudara Tiri" value={student.jumlahSaudaraTiri} />
+                  <DataField label="Tinggi Badan (cm)" value={student.tinggiBadan} />
+                  <DataField label="Berat Badan (kg)" value={student.beratBadan} />
+                  <DataField label="Lingkar Kepala (cm)" value={student.lingkarKepala} />
+                  <DataField label="Asal Sekolah (SMP/MTs)" value={student.sekolahAsal} />
               </DataSection>
           </div>
         </div>
@@ -115,15 +122,9 @@ export function StudentPrintProfile({ student, settings }: { student: Student; s
       </div>
        <div className="grid grid-cols-2 gap-x-8 mt-2">
            <DataSection>
-               <DataField label="Jumlah Saudara Kandung" value={student.jumlahSaudaraKandung} />
-               <DataField label="Tinggi Badan (cm)" value={student.tinggiBadan} />
-               <DataField label="Lingkar Kepala (cm)" value={student.lingkarKepala} />
                <DataField label="Hobi" value={student.hobi} />
            </DataSection>
            <DataSection>
-               <DataField label="Jumlah Saudara Tiri" value={student.jumlahSaudaraTiri} />
-               <DataField label="Berat Badan (kg)" value={student.beratBadan} />
-               <DataField label="Asal Sekolah (SMP/MTs)" value={student.sekolahAsal} />
                <DataField label="Cita-cita" value={student.citaCita} />
            </DataSection>
       </div>

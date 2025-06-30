@@ -178,9 +178,9 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
               onSelect={field.onChange}
               disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
               initialFocus
-              captionLayout={name === 'tanggalLahir' ? "dropdown" : "buttons"}
-              fromYear={name === 'tanggalLahir' ? 1950 : undefined}
-              toYear={name === 'tanggalLahir' ? new Date().getFullYear() : undefined}
+              captionLayout="dropdown"
+              fromYear={1950}
+              toYear={new Date().getFullYear()}
             />
           </PopoverContent>
         </Popover>
@@ -275,6 +275,7 @@ export function EditStudentForm({ student }: EditStudentFormProps) {
                         <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="Tidak" /></FormControl><FormLabel className="font-normal">Tidak</FormLabel></FormItem>
                     </RadioGroup></FormControl><FormMessage /></FormItem>
                     )} />
+                    {renderInput('uangMasuk', 'Keterangan Uang Masuk', 'Contoh: Lunas / Cicil 1', 'text')}
                     {renderInput('sekolahAsal', 'Asal Sekolah SMP/MTs', 'Nama sekolah sebelumnya')}
                     {renderInput('tinggiBadan', 'Tinggi Badan (cm)', 'Contoh: 160', 'number')}
                     {renderInput('beratBadan', 'Berat Badan (kg)', 'Contoh: 50', 'number')}

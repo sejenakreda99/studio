@@ -77,7 +77,8 @@ const excelColumns = [
     { header: 'Kecamatan', key: 'kecamatan' }, { header: 'Kode Pos', key: 'kodePos' },
     { header: 'Tempat Tinggal', key: 'tempatTinggal' }, { header: 'Moda Transportasi', key: 'modaTransportasi' },
     { header: 'Anak Ke-berapa', key: 'anakKeberapa' }, { header: 'Status Yatim/Piatu', key: 'statusAnak' },
-    { header: 'Punya KIP?', key: 'punyaKip' }, { header: 'Asal Sekolah SMP/MTs', key: 'sekolahAsal' },
+    { header: 'Punya KIP?', key: 'punyaKip' }, { header: 'Keterangan Uang Masuk', key: 'uangMasuk' },
+    { header: 'Asal Sekolah SMP/MTs', key: 'sekolahAsal' },
     { header: 'Tinggi Badan (cm)', key: 'tinggiBadan' }, { header: 'Berat Badan (kg)', key: 'beratBadan' },
     { header: 'Lingkar Kepala (cm)', key: 'lingkarKepala' }, { header: 'Jumlah Saudara Kandung', key: 'jumlahSaudaraKandung' },
     { header: 'Jumlah Saudara Tiri', key: 'jumlahSaudaraTiri' }, { header: 'Hobi', key: 'hobi' },
@@ -396,6 +397,7 @@ export function StudentList({
             <TableHead>Status Validasi</TableHead>
             <TableHead>Catatan Residu</TableHead>
             <TableHead className="hidden md:table-cell">Status Anak</TableHead>
+            <TableHead className="hidden md:table-cell">Uang Masuk</TableHead>
             <TableHead>Aksi</TableHead>
             <TableHead>
               <span className="sr-only">Cetak</span>
@@ -436,6 +438,7 @@ export function StudentList({
                   '-'
                 )}
               </TableCell>
+              <TableCell className="hidden md:table-cell">{student.uangMasuk || '-'}</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

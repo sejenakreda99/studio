@@ -42,6 +42,7 @@ export const studentFormSchema = z.object({
   anakKeberapa: optionalString,
   statusAnak: z.string().optional().nullable(),
   punyaKip: z.enum(['Ya', 'Tidak']).optional().nullable(),
+  uangMasuk: optionalString,
   sekolahAsal: optionalString,
   tinggiBadan: optionalString,
   beratBadan: optionalString,
