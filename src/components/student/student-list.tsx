@@ -337,7 +337,6 @@ export function StudentList({
     }
     
     const isAllSelected = selectedIds.length > 0 && selectedIds.length === studentList.length;
-    const isSomeSelected = selectedIds.length > 0 && selectedIds.length < studentList.length;
 
     const handleSelectAll = (checked: boolean) => {
       if (checked) {
