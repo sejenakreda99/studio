@@ -64,11 +64,11 @@ import { Checkbox } from '../ui/checkbox';
 
 
 const excelColumns = [
-    // Data Pribadi (33)
+    // Data Pribadi
     { header: 'Nama Lengkap', key: 'namaLengkap' }, { header: 'Jenis Kelamin', key: 'jenisKelamin' },
     { header: 'NISN', key: 'nisn' }, { header: 'NIS', key: 'nis' },
     { header: 'NIK', key: 'nik' }, { header: 'No. Kartu Keluarga', key: 'noKk' },
-    { header: 'Tempat Lahir', key: 'tempatLahir' }, { header: 'Tanggal Lahir (DD-MM-YYYY)', key: 'tanggalLahir' },
+    { header: 'Tempat Lahir', key: 'tempatLahir' }, { header: 'Tanggal Lahir (YYYY-MM-DD)', key: 'tanggalLahir' },
     { header: 'No. Registrasi Akta Lahir', key: 'noRegistrasiAktaLahir' }, { header: 'Agama & Kepercayaan', key: 'agama' },
     { header: 'Kewarganegaraan', key: 'kewarganegaraan' }, { header: 'Nama Negara', key: 'namaNegara' },
     { header: 'Berkebutuhan Khusus Siswa', key: 'berkebutuhanKhusus' }, { header: 'Alamat Jalan', key: 'alamatJalan' },
@@ -83,21 +83,21 @@ const excelColumns = [
     { header: 'Lingkar Kepala (cm)', key: 'lingkarKepala' }, { header: 'Jumlah Saudara Kandung', key: 'jumlahSaudaraKandung' },
     { header: 'Jumlah Saudara Tiri', key: 'jumlahSaudaraTiri' }, { header: 'Hobi', key: 'hobi' },
     { header: 'Cita-cita', key: 'citaCita' },
-    // Data Ayah (8)
+    // Data Ayah
     { header: 'Nama Ayah Kandung', key: 'namaAyah' }, { header: 'Status Ayah', key: 'statusAyah' },
     { header: 'NIK Ayah', key: 'nikAyah' }, { header: 'Tahun Lahir Ayah', key: 'tahunLahirAyah' },
     { header: 'Pendidikan Terakhir Ayah', key: 'pendidikanAyah' }, { header: 'Pekerjaan Ayah', key: 'pekerjaanAyah' },
     { header: 'Penghasilan Bulanan Ayah', key: 'penghasilanAyah' }, { header: 'Berkebutuhan Khusus Ayah', key: 'berkebutuhanKhususAyah' },
-    // Data Ibu (8)
+    // Data Ibu
     { header: 'Nama Ibu Kandung', key: 'namaIbu' }, { header: 'Status Ibu', key: 'statusIbu' },
     { header: 'NIK Ibu', key: 'nikIbu' }, { header: 'Tahun Lahir Ibu', key: 'tahunLahirIbu' },
     { header: 'Pendidikan Terakhir Ibu', key: 'pendidikanIbu' }, { header: 'Pekerjaan Ibu', key: 'pekerjaanIbu' },
     { header: 'Penghasilan Bulanan Ibu', key: 'penghasilanIbu' }, { header: 'Berkebutuhan Khusus Ibu', key: 'berkebutuhanKhususIbu' },
-    // Data Wali (6)
+    // Data Wali
     { header: 'Nama Wali', key: 'namaWali' }, { header: 'NIK Wali', key: 'nikWali' },
     { header: 'Tahun Lahir Wali', key: 'tahunLahirWali' }, { header: 'Pendidikan Terakhir Wali', key: 'pendidikanWali' },
     { header: 'Pekerjaan Wali', key: 'pekerjaanWali' }, { header: 'Penghasilan Bulanan Wali', key: 'penghasilanWali' },
-    // Kontak (3)
+    // Kontak
     { header: 'Nomor Telepon Rumah', key: 'nomorTeleponRumah' }, { header: 'Nomor HP', key: 'nomorHp' },
     { header: 'Email', key: 'email' },
 ];
@@ -240,57 +240,25 @@ export function StudentList({
       return;
     }
   
-    const groupHeadersConfig = [
-        { title: ' ', span: 1 }, 
-        { title: 'Data Pribadi', span: 33 }, { title: 'Data Ayah', span: 8 },
-        { title: 'Data Ibu', span: 8 }, { title: 'Data Wali', span: 6 },
-        { title: 'Kontak', span: 3 }, { title: 'Status Pendaftaran', span: 3 },
-    ];
-  
-    const mainHeaderRow = ['REKAPITULASI DATA SISWA'];
-  
-    const groupHeaderRow: string[] = [];
-    const merges = [];
-    let currentCol = 0;
-    for (const group of groupHeadersConfig) {
-      groupHeaderRow.push(group.title);
-      if (group.span > 1) {
-        merges.push({ s: { r: 2, c: currentCol }, e: { r: 2, c: currentCol + group.span - 1 } });
-        for (let i = 1; i < group.span; i++) groupHeaderRow.push('');
-      }
-      currentCol += group.span;
-    }
-    merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: currentCol - 1 } });
-  
-    const columnHeaderRow = [
-      'No. Urut', ...excelColumns.map(c => c.header),
-      'Tanggal Registrasi (DD-MM-YYYY)', 'Status Validasi', 'Catatan Validasi'
-    ];
-  
-    const worksheetData = [ mainHeaderRow, [], groupHeaderRow, columnHeaderRow ];
-    
-    const dataToExport = studentsToExport.map((student, index) => {
-      const row: any[] = [index + 1];
-      excelColumns.forEach(col => {
+    const headers = excelColumns.map(c => c.header);
+    const dataToExport = studentsToExport.map(student => {
+      return excelColumns.map(col => {
         let value = student[col.key as keyof Student];
-        if (Array.isArray(value)) value = value.join(', ');
-        row.push(value ?? '');
+        if (Array.isArray(value)) {
+          return value.join(', ');
+        }
+        return value ?? null;
       });
-      row.push(student.tanggalRegistrasi, student.statusValidasi ?? '', student.catatanValidasi ?? '');
-      return row;
     });
   
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    XLSX.utils.sheet_add_aoa(worksheet, dataToExport, { origin: 'A5' });
-  
-    worksheet['!merges'] = merges;
-    const filterRange = `A4:${XLSX.utils.encode_col(columnHeaderRow.length - 1)}4`;
-    worksheet['!autofilter'] = { ref: filterRange };
-  
-    const allDataForWidthCalc = [...worksheetData.slice(2), ...dataToExport];
-    const colWidths = columnHeaderRow.map((_, i) => ({
-      wch: Math.max(...allDataForWidthCalc.map(row => (row[i] ? row[i].toString().length : 0))) + 2,
-    }));
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...dataToExport]);
+    
+    const colWidths = headers.map((h, i) => {
+      const headerLength = h ? h.toString().length : 0;
+      const dataLengths = dataToExport.map(row => row[i] ? row[i].toString().length : 0);
+      const maxLength = Math.max(headerLength, ...dataLengths);
+      return { wch: maxLength + 2 };
+    });
     worksheet['!cols'] = colWidths;
     
     const workbook = XLSX.utils.book_new();
@@ -299,10 +267,14 @@ export function StudentList({
   };
 
   const handleDownloadTemplate = () => {
-    const headers = excelColumns.map(c => c.header.replace(' (DD-MM-YYYY)', ' (YYYY-MM-DD)'));
+    const headers = excelColumns.map(c => c.header);
     const worksheet = XLSX.utils.aoa_to_sheet([headers]);
+    
+    const colWidths = headers.map(h => ({ wch: h.length + 5 }));
+    worksheet['!cols'] = colWidths;
+
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Template_Import_Siswa.xlsx");
     XLSX.writeFile(workbook, "Template_Import_Siswa.xlsx");
   };
 
@@ -321,11 +293,14 @@ export function StudentList({
 
             const newStudents: Partial<StudentFormValues>[] = json.map(row => {
                 const student: Partial<StudentFormValues> = {};
-                for (const header in row) {
-                     const cleanHeader = header.replace(' (YYYY-MM-DD)', '');
-                    if (excelHeadersToKeys[cleanHeader]) {
-                        const key = excelHeadersToKeys[cleanHeader] as keyof StudentFormValues;
-                        (student as any)[key] = row[header];
+                for (const excelHeader in row) {
+                    if (excelHeadersToKeys[excelHeader]) {
+                        const key = excelHeadersToKeys[excelHeader] as keyof StudentFormValues;
+                        let value = row[excelHeader];
+                        if (value instanceof Date) {
+                            value = format(value, 'yyyy-MM-dd');
+                        }
+                        (student as any)[key] = value;
                     }
                 }
                 return student;

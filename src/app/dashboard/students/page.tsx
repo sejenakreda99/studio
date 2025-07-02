@@ -140,45 +140,69 @@ function StudentListPageContent() {
   const handleImportStudents = async (newStudents: Partial<StudentFormValues>[]) => {
     const { dismiss } = toast({
       title: 'Mengimpor Data...',
-      description: 'Mohon tunggu, data siswa sedang ditambahkan ke sistem.',
+      description: 'Mohon tunggu, data siswa sedang diperiksa dan diproses.',
     });
 
     try {
-      const batch = writeBatch(db!);
-      newStudents.forEach(studentData => {
-        const studentRef = doc(collection(db!, 'students'));
-        
-        const processedData: { [key: string]: any } = {
-          ...studentData,
-          tanggalRegistrasi: format(new Date(), 'yyyy-MM-dd'),
-          statusValidasi: 'Belum Diverifikasi',
-          catatanValidasi: null,
-        };
-
-        for (const key in processedData) {
-          if (processedData[key] === undefined) {
-            processedData[key] = null;
-          }
+      // Create a map of existing NISN to student ID for quick lookups.
+      const nisnToIdMap = new Map<string, string>();
+      students.forEach(student => {
+        if (student.nisn) {
+          nisnToIdMap.set(student.nisn, student.id);
         }
-        batch.set(studentRef, processedData);
+      });
+
+      const batch = writeBatch(db!);
+      let updatedCount = 0;
+      let createdCount = 0;
+
+      newStudents.forEach(studentData => {
+        const studentNisn = studentData.nisn;
+
+        // Prepare the data by removing any undefined properties
+        const processedData: { [key: string]: any } = {};
+        Object.keys(studentData).forEach(key => {
+            const typedKey = key as keyof typeof studentData;
+            if (studentData[typedKey] !== undefined) {
+                processedData[typedKey] = studentData[typedKey];
+            }
+        });
+
+        // If the row has an NISN and it exists in our map, it's an UPDATE.
+        if (studentNisn && nisnToIdMap.has(studentNisn)) {
+          const studentId = nisnToIdMap.get(studentNisn)!;
+          const studentRef = doc(db!, 'students', studentId);
+          batch.update(studentRef, processedData);
+          updatedCount++;
+        } else { // Otherwise, it's a CREATE.
+          const studentRef = doc(collection(db!, 'students'));
+          const createData = {
+            ...processedData,
+            tanggalRegistrasi: format(new Date(), 'yyyy-MM-dd'),
+            statusValidasi: 'Belum Diverifikasi',
+            catatanValidasi: null,
+          };
+          batch.set(studentRef, createData);
+          createdCount++;
+        }
       });
 
       await batch.commit();
 
+      dismiss();
       toast({
         title: "Impor Berhasil!",
-        description: `${newStudents.length} data siswa baru telah berhasil diimpor.`,
+        description: `${createdCount} data baru ditambahkan. ${updatedCount} data yang ada diperbarui.`,
       });
       fetchStudents(); 
     } catch (error) {
       console.error("Error importing students: ", error);
+      dismiss();
       toast({
         variant: "destructive",
         title: "Gagal Mengimpor Data",
-        description: "Terjadi kesalahan. Pastikan format file Excel Anda benar.",
+        description: "Terjadi kesalahan. Pastikan format file Excel dan isiannya (misal: NIK 16 digit) sudah benar.",
       });
-    } finally {
-      dismiss();
     }
   };
 
